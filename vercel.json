@@ -8,11 +8,11 @@
   "routes": [
     {
       "src": "/admin/(.*)",
-      "dest": "/app.js"
+      "dest": "/index.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/app.js"
+      "dest": "/index.js"
     }
   ]
 }
