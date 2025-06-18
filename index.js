@@ -57,3 +57,16 @@ if (process.env.NODE_ENV !== 'production') {
     console.log(`Example app listening on port ${port}`) 
   })
 }
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error details:', err);
+    res.status(500).json({ 
+        error: 'Internal Server Error',
+        message: err.message 
+    });
+});
+
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({ error: 'Route not found' });
+});
