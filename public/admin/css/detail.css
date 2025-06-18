@@ -1,0 +1,258 @@
+/* Simple Product Detail Styles */
+.product-detail {
+    background: #f8f9fa;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.product-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Product Header */
+.product-header {
+    padding: 2rem 2rem 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.product-header h1 {
+    color: #333;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Main Content */
+.product-content {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+/* Product Image */
+.product-image-section {
+    flex: 0 0 300px;
+}
+
+.product-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+/* Product Info Grid */
+.product-info {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-content: start;
+}
+
+.info-group {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+}
+
+.info-group.price {
+    border-left-color: #28a745;
+}
+
+.info-group.stock {
+    border-left-color: #ffc107;
+}
+
+.info-group.status {
+    border-left-color: #dc3545;
+}
+
+.info-group.discount {
+    border-left-color: #17a2b8;
+}
+
+.info-group.position {
+    border-left-color: #6c757d;
+}
+
+.info-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.info-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.price-value {
+    color: #28a745;
+    font-size: 1.4rem;
+}
+
+.stock-value {
+    color: #ffc107;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.inactive {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Description Section */
+.description-section {
+    padding: 0 2rem 2rem;
+    border-top: 1px solid #e9ecef;
+    margin-top: 1rem;
+    padding-top: 2rem;
+}
+
+.description-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.description-content {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+}
+
+.description-text {
+    color: #555;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Edit Button */
+.edit-button {
+    margin: 1rem 2rem 2rem;
+}
+
+.btn-edit {
+    background: #ffc107;
+    color: #212529;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.2s;
+}
+
+.btn-edit:hover {
+    background: #e0a800;
+    color: #212529;
+    text-decoration: none;
+}
+
+/* Error State */
+.error-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #dc3545;
+}
+
+.error-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+}
+
+.error-message h4 {
+    color: #dc3545;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.error-message p {
+    color: #6c757d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .product-content {
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+    
+    .product-image-section {
+        flex: none;
+    }
+    
+    .product-info {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .info-group {
+        padding: 1rem;
+    }
+    
+    .product-header {
+        padding: 1.5rem;
+    }
+    
+    .product-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .description-section {
+        padding: 0 1.5rem 1.5rem;
+    }
+    
+    .edit-button {
+        margin: 1rem 1.5rem 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .product-detail {
+        padding: 1rem 0;
+    }
+    
+    .product-card {
+        margin: 0 1rem;
+    }
+    
+    .product-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .info-value {
+        font-size: 1.1rem;
+    }
+    
+    .price-value {
+        font-size: 1.2rem;
+    }
+}

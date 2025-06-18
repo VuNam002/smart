@@ -1,0 +1,119 @@
+extends ../../layouts/default.pug
+include ../../mixins/filterStatus.pug
+include ../../mixins/search.pug
+include ../../mixins/pagination.pug
+include ../../mixins/form-change-mutil.pug
+
+block main
+  h1.mb-4.text-primary Trang danh sách sản phẩm
+
+  .card.mb-4.shadow-sm
+    .card-header.bg-light.font-weight-bold Bộ lọc và tìm kiếm
+    .card-body
+      .row.g-3.align-items-center
+        .col-12.col-md-6
+          +filterStatus(filterStatus)
+        .col-12.col-md-6
+          +search(keyword)
+
+  .card.shadow-sm
+    .card-header.bg-light.font-weight-bold Danh sách sản phẩm
+    .card-body.p-0
+      .row 
+        .col-8
+          +form-change-mutil(`${prefixAdmin}/products/change-nulti?_method=PATCH`)
+        .col-4.d-flex.justify-content-end.align-items-center
+          a(
+            href=`${prefixAdmin}/products/create`
+            class="px-4 btn btn-success btn-sm fw-bold"
+          ) Thêm mới
+
+      form#form-change-position(
+        action=`${prefixAdmin}/products/change-position?_method=PATCH`
+        method="POST"
+      )
+        .table-responsive
+          table.table.table-hover.table-bordered.mb-0#checkbox-nulti
+            thead.table-secondary
+              tr
+                th.text-center
+                  input(type="checkbox" name="checkall")
+                th.text-center(style="width:50px") STT
+                th.text-center Hình ảnh
+                th.text-center Tiêu đề
+                th.text-center Giá
+                th.text-center Vị trí
+                th.text-center Trạng thái
+                th.text-center Hành động
+            tbody
+              if products.length === 0
+                tr
+                  td.text-center.text-muted(colspan="7") Không có sản phẩm nào.
+              else
+                each item, index in products
+                  tr
+                    td.text-center
+                      input(type="checkbox" name="ids" value=item._id form="form-change-position")
+                    td.text-center #{index + 1}
+                    td.text-center
+                      img(
+                        src=item.thumbnail
+                        alt=item.title
+                        width="50"
+                        height="50"
+                        style="object-fit:cover;border-radius:6px;"
+                      )
+                    td #{item.title}
+                    td.text-nowrap #{item.price}$
+                    td 
+                      input(
+                        type="number"
+                        value = item.position
+                        style = "width:60px"
+                        min="1"
+                        name= `positions[${item._id}]`
+                        form="form-change-position"
+                      )
+                    td
+                      button.badge(
+                        type="button"
+                        data-status=item.status
+                        data-id=item._id
+                        class=(item.status == "active" ? "bg-success text-white" : "bg-danger text-white")
+                        style="cursor:pointer;min-width:90px"
+                        button-change-status
+                      )
+                        = item.status == "active" ? "Hoạt động" : "Dừng hoạt động"
+                    td.text-center
+                      a.btn.btn-warning.btn-sm.me-1(
+                        href=`${prefixAdmin}/products/edit/${item._id}`
+                      ) Sửa
+                        a.btn.btn-secondary.btn-sm.me-1(
+                        href=`${prefixAdmin}/products/detail/${item._id}`
+                      ) Chi tiết
+                      button.btn.btn-danger.btn-sm.ms-1(
+                        type="button"
+                        button-delete
+                        data-id=item._id
+                      ) Xóa
+          button.btn.btn-success.mt-2.ms-2(type="submit") Lưu vị trí
+        
+
+  .mt-4
+    +pagination(pagination, keyword)
+
+  form#form-change-status(
+    action=""
+    method="POST"
+    data-path=`${prefixAdmin}/products/change-status`
+    style="display:none"
+  )
+
+  form(
+    action = ""
+    method = "POST"
+    id = "form-delete-item"
+    data-path=`${prefixAdmin}/products/delete`
+  )
+
+  script(src="/admin/js/product.js")

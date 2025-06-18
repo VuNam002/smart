@@ -1,0 +1,29 @@
+mixin pagination(pagination, keyword)
+    nav
+        ul.pagination
+            //- Trang trước
+            if pagination.currentPage > 1
+                li.page-item
+                    button.page-link(
+                        type="button"
+                        button-pagination= pagination.currentPage - 1
+                        data-keyword=keyword
+                    ) Trang trước
+
+            //- Các trang
+            - for (var i = 1; i <= pagination.totalPage; i++)
+                li(class=`page-item ${pagination.currentPage == i ? "active": ""}`)
+                    button.page-link(
+                        type="button"
+                        button-pagination=i
+                        data-keyword=keyword
+                    ) #{i}
+
+            //- Kế tiếp
+            if pagination.currentPage < pagination.totalPage
+                li.page-item
+                    button.page-link(
+                        type="button"
+                        button-pagination= pagination.currentPage + 1
+                        data-keyword=keyword
+                    ) Kế tiếp

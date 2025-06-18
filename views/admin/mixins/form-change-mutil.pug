@@ -1,0 +1,14 @@
+mixin form-change-mutil(action)
+  form(
+    action=action
+    method="POST"
+    form-change-nulti
+  )
+    .d-flex.align-items-center.gap-3.p-3.flex-wrap
+      select.form-control.w-auto(name="type" required)
+        option(value="active") Hoạt động
+        option(value="inactive") Dừng hoạt động
+        option(value="delete") Xóa nhiều sản phẩm
+        option(value="change-position") Thay đổi vị trí
+      input(type="text" name="ids" class="d-none")
+      button.btn.btn-primary(type="submit") Áp dụng

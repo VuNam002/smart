@@ -1,0 +1,10 @@
+mixin alertError(time)
+    if messages && messages.error
+        .message.info 
+            div(
+                class="alert alert-danger"
+                show-alert
+                data-time=time
+            )
+                | #{messages.error}
+                span(close-alert) x

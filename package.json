@@ -1,0 +1,36 @@
+{
+  "name": "product-management",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --inspect index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "connect-flash": "^0.1.1",
+    "dotenv": "^16.5.0",
+    "env": "^0.0.2",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "method-override": "^3.0.0",
+    "mongodb": "^6.17.0",
+    "mongoose": "^8.15.1",
+    "mongoose-slug-updater": "^3.3.0",
+    "multer": "^2.0.1",
+    "pug": "^3.0.3"
+  },
+  "devDependencies": {
+    "@prettier/plugin-pug": "^3.4.0",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.5.3"
+  },
+  "prettier": {
+    "plugins": [
+      "@prettier/plugin-pug"
+    ]
+  }
+}

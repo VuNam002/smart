@@ -1,0 +1,131 @@
+extends ../../layouts/default.pug 
+include ../../mixins/alert.pug
+
+block main 
+    +alertError(4000)
+
+    h1(class="mb-4") Chỉnh sửa sản phẩm
+
+
+    form(
+        action = `${prefixAdmin}/products/edit/:id`
+        id="form-edit-product"
+        method="POST"
+        enctype="multipart/form-data"
+    )
+        div(Class="form-group")
+            label(for="title") Tiêu đề
+            input(
+                type="text"
+                class="form-control"
+                id="title"
+                name="title"
+                required
+                value = product.title
+            )
+        div(class="form-group")
+            label(for="desc") Mô tả
+            textarea(
+                class="form-control"
+                id="desc"
+                name="description"
+                rows="5"
+                value = product.description
+            ) #{product.description}
+        div(class="form-group")
+            label(for="price") Giá
+            input(
+                type="number"
+                class="form-control"
+                id="price"
+                name="price"
+                value=product.price
+                min="0"
+            )
+        
+        div(class="form-group")
+            label(for="discount") % Giảm giá
+            input(
+                type="number"
+                class="form-control"
+                id="discount"
+                name="discountPercentage"
+                value=product.discountPercentage
+                min="0"
+            )
+        div(class="form-group")
+            label(for="stock") Số lượng
+            input(
+                type="number"
+                class="form-control"
+                id="stock"
+                name="stock"
+                value=product.stock
+                min="0"
+            )
+
+        div(class="form-group" upload-image)
+            label(for="thumbnail") Ảnh
+            input(
+                upload-image-input
+                type="file"
+                class="form-control-file"
+                id="thumbnail"
+                name="thumbnail"
+                accept="image/*"
+            )
+            button(
+                type="button"
+                class="btn btn-sm btn-danger ms-2"
+                upload-image-remove
+                style="display:none;position:absolute;right:10px;top:10px;z-index:2;"
+            ) x
+            if product.thumbnail
+                img(
+                    src=product.thumbnail
+                    upload-image-preview
+                    class="image-preview"
+                )
+
+        div(class="form-group")
+            lable(for="position") Vị trí
+            input(
+                type="number"
+                class="form-control"
+                id = "position"
+                name = "position"
+                placeholder= "Tự động tăng"
+                min= "1"
+                value=product.position
+            )
+
+        div(class="mb-3 form-group")
+            label.mb-2 Trạng thái
+            div.form-check.form-check-inline
+                input(
+                    type="radio"
+                    class="form-check-input"
+                    id="statusActive"
+                    name="status"
+                    value="active"
+                    checked=(product.status=='active'? true: false)
+                )
+                label.form-check-label(for="statusActive") Hoạt động
+            div.form-check.form-check-inline
+                input(
+                    type="radio"
+                    class="form-check-input"
+                    id="statusInActive"
+                    name="status"
+                    value="inactive"
+                    checked=(product.status=='inactive'? true: false)
+                )
+                label.form-check-label(for="statusInActive") Dừng hoạt động
+
+        div(class="form-group")
+        button(
+            type="submit"
+            class="btn btn-primary"
+        ) Cập nhật
+
+    script(src="/admin/js/product.js")

@@ -1,0 +1,26 @@
+//- kế thừa
+extends ../../layouts/default.pug 
+include ../../mixins/box-head.pug
+
+block main
+  .container.my-4
+    .row
+      .col-12.mb-4
+        +box-head("Danh sách sản phẩm")
+
+    
+    .row.g-3
+      each item in products
+        .col-lg-3.col-md-4.col-6
+          .card.product-card
+            a(href=`/products/${item.slug}`)
+              img.card-img-top(
+                src=item.thumbnail
+                alt=item.title
+              )
+              .inner-content
+                h6.card-title #{item.title}
+                .price
+                  span.inner-price-old #{item.priceNew}$
+                  span.current-price #{item.price}$
+                  span.inner-discount #{item.discountPercentage}%
