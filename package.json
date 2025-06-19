@@ -11,6 +11,7 @@
   "description": "��#\u0000 \u0000S\u0000m\u0000a\u0000r\u0000t\u0000M\u0000a\u0000r\u0000t\u0000\r\u0000 \u0000",
   "dependencies": {
     "body-parser": "^2.2.0",
+    "cloudinary": "^2.7.0",
     "connect-flash": "^0.1.1",
     "dotenv": "^16.5.0",
     "env": "^0.0.2",
@@ -21,7 +22,8 @@
     "mongoose": "^8.15.1",
     "mongoose-slug-updater": "^3.3.0",
     "multer": "^2.0.1",
-    "pug": "^3.0.3"
+    "pug": "^3.0.3",
+    "streamifier": "^0.1.1"
   },
   "devDependencies": {
     "@prettier/plugin-pug": "^3.4.0",

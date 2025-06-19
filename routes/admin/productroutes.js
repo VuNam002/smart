@@ -1,26 +1,35 @@
-//Đây là trang sảm phẩm
 const express = require("express");
 const router = express.Router();
-const multer = require("multer")
-const storageMulter = require("../../helpers/storageMulter");
-const upload = multer({ storage: storageMulter()});
+const multer = require("multer");
+const upload = multer({ storage: multer.memoryStorage() });
 
 const controller = require("../../controllers/admin/productcontrollers");
-const validate = require("../../validates/admin/product.validates")
+const validate = require("../../validates/admin/product.validates");
+const uploadToCloudinary = require("../../helpers/uploadCloudinary");
 
 router.get("/", controller.index);
-router.patch("/change-status/:status/:id",controller.changeStatus);
-router.patch("/change-nulti/",controller.changeNulti);
-router.delete("/delete/:id",controller.deleteItem);
+router.patch("/change-status/:status/:id", controller.changeStatus);
+router.patch("/change-nulti/", controller.changeNulti);
+router.delete("/delete/:id", controller.deleteItem);
 router.patch("/change-position", controller.changePosition);
 router.get("/create", controller.create);
-router.post("/create",
-    upload.single('thumbnail'),      // Multer phải chạy trước
-    validate.createPost,             // Validate sau khi đã có req.body
+
+router.post(
+    "/create",
+    upload.single('thumbnail'),
+    uploadToCloudinary,
+    validate.createPost,
     controller.createPost
 );
-router.get("/edit/:id", controller.edit);
-router.get("/detail/:id", controller.detail);
 
+router.get("/edit/:id", controller.edit);//Hiển thị form chỉnh sửa sản phẩm
+router.get("/detail/:id", controller.detail);
+router.post( //Xử lý cập nhật sản phẩm
+    "/edit/:id",
+    upload.single('thumbnail'),
+    uploadToCloudinary,
+    validate.createPost,
+    controller.updatePost
+);
 
 module.exports = router;

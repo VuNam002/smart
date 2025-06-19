@@ -145,9 +145,9 @@ module.exports.createPost = async (req, res) => {
   }
 
   // Nếu có file upload thì lấy đường dẫn file
-  if (req.file) {
-    req.body.thumbnail = `/uploads/${req.file.filename}`;
-  }
+  // if (req.file) {
+  //   req.body.thumbnail = `/uploads/${req.file.filename}`;
+  // }
 
   try {
     const product = new Product(req.body);
@@ -195,5 +195,41 @@ module.exports.detail = async (req, res) => {
     });
   }catch(error) {
     res.redirect(`${systemConfig.prefixAdmin}/products`);
+  }
+};
+
+// [POST] /admin/products/edit/:id
+module.exports.updatePost = async (req, res) => {
+  try {
+    const id = req.params.id;
+    // Validate lại dữ liệu
+    if (!req.body.title || req.body.title.trim().length < 2) {
+      req.flash("error", "Tiêu đề không được để trống và phải có ít nhất 8 ký tự!");
+      const backURL = req.header("Referer") || "/admin/products";
+      return res.redirect(backURL);
+    }
+
+    // Chuyển đổi kiểu dữ liệu
+    req.body.price = parseInt(req.body.price) || 0;
+    req.body.discountPercentage = parseInt(req.body.discountPercentage) || 0;
+    req.body.stock = parseInt(req.body.stock) || 0;
+    req.body.position = parseInt(req.body.position) || 1;
+
+    // Nếu có file upload mới thì cập nhật thumbnail
+    if (req.file && req.file.cloudinaryUrl) {
+      req.body.thumbnail = req.file.cloudinaryUrl;
+    }
+
+    // Cập nhật sản phẩm
+    await Product.updateOne(
+      { _id: id },
+      { $set: req.body }
+    );
+
+    res.redirect(`${systemConfig.prefixAdmin}/products`);
+  } catch (err) {
+    req.flash("error", "Có lỗi xảy ra khi cập nhật sản phẩm!");
+    const backURL = req.header("Referer") || "/admin/products";
+    res.redirect(backURL);
   }
 };
