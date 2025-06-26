@@ -30,9 +30,17 @@ module.exports.index = async (req, res) => {
     countProducts
   );
 
+  // Sort
+  let sort = { position: -1 }; // mặc định: vị trí giảm dần
+
+  if (req.query.sortKey && req.query.sortValue) {
+    const value = req.query.sortValue === "asc" ? 1 : -1;
+    sort = { [req.query.sortKey]: value };
+  }
+
   // Lấy sản phẩm theo trang
   const products = await Product.find(find)
-    .sort({position:"desc"})
+    .sort(sort)
     .skip(objectPagination.skip)
     .limit(objectPagination.limitItems);
 
@@ -79,14 +87,25 @@ module.exports.changeNulti = async (req, res) => {
   res.redirect(backURL);
 };
 
-// [DELETE] /admin/products/delete/:id
+// [DELETE] /admin/products/delete/:id đây là xóa mềm
+// module.exports.deleteItem = async (req, res) => {
+//   const id = req.params.id;
+
+//   await Product.updateOne({_id: id}, {
+//     deleted: true,
+//     deleteAt: new Date()
+//   });
+
+//   const backURL = req.header("Referer") || "/admin/products";
+//   res.redirect(backURL);
+// };
+
+// [DELETE] /admin/products/delete/:id  đây là xóa cứng
 module.exports.deleteItem = async (req, res) => {
   const id = req.params.id;
 
-  await Product.updateOne({_id: id}, {
-    deleted: true,
-    deleteAt: new Date()
-  });
+  // XÓA CỨNG: Xóa luôn khỏi database
+  await Product.deleteOne({ _id: id });
 
   const backURL = req.header("Referer") || "/admin/products";
   res.redirect(backURL);
@@ -125,9 +144,9 @@ module.exports.create = async (req, res) => {
 
 // [POST] /admin/products/create
 module.exports.createPost = async (req, res) => {
-  // Kiểm tra tiêu đề không được để trống và phải >= 8 ký tự
-  if (!req.body.title || req.body.title.trim().length < 8) {
-    req.flash("error", "Tiêu đề không được để trống và phải có ít nhất 8 ký tự!");
+  // Kiểm tra tiêu đề không được để trống và phải 2 ký tự
+  if (!req.body.title || req.body.title.trim().length < 2) {
+    req.flash("error", "Tiêu đề không được để trống ");
     const backURL = req.header("Referer") || "/admin/products";
     return res.redirect(backURL);
   }
@@ -144,24 +163,25 @@ module.exports.createPost = async (req, res) => {
     req.body.position = parseInt(req.body.position) || 1;
   }
 
-  // Nếu có file upload thì lấy đường dẫn file
-  // if (req.file) {
-  //   req.body.thumbnail = `/uploads/${req.file.filename}`;
-  // }
+  // Nếu có file upload thì lấy đường dẫn file từ Cloudinary
+  if (req.file && req.file.cloudinaryUrl) {
+    req.body.thumbnail = req.file.cloudinaryUrl;
+  }
 
   try {
     const product = new Product(req.body);
     await product.save();
+    req.flash("success", "Thêm sản phẩm thành công!");
     res.redirect(`${systemConfig.prefixAdmin}/products`);
   } catch (err) {
+    console.log("Error creating product:", err);
     req.flash("error", "Có lỗi xảy ra khi lưu sản phẩm!");
     const backURL = req.header("Referer") || "/admin/products";
     res.redirect(backURL);
   }
 };
 
-
-//[POST] /admin/products/edit/:id
+//[GET] /admin/products/edit/:id - Hiển thị form edit
 module.exports.edit = async (req, res) => {
   try {
     const find = {
@@ -170,17 +190,22 @@ module.exports.edit = async (req, res) => {
     };
     const product = await Product.findOne(find);
 
+    if (!product) {
+      req.flash("error", "Không tìm thấy sản phẩm!");
+      return res.redirect(`${systemConfig.prefixAdmin}/products`);
+    }
     res.render("admin/pages/products/edit", {
       pageTitle: "Chỉnh sửa sản phẩm",
       product: product
     });
   } catch (err) {
+    console.log("Error finding product:", err);
     req.flash("error", "Không tìm thấy sản phẩm!");
-    const backURL = req.header("Referer") || "/admin/products";
-    res.redirect(backURL);
+    res.redirect(`${systemConfig.prefixAdmin}/products`);
   }
 };
 
+// [GET] /admin/products/detail/:id
 module.exports.detail = async (req, res) => {
   try {
     const find = {
@@ -189,47 +214,66 @@ module.exports.detail = async (req, res) => {
     };
     const product = await Product.findOne(find);
 
+    if (!product) {
+      req.flash("error", "Không tìm thấy sản phẩm!");
+      return res.redirect(`${systemConfig.prefixAdmin}/products`);
+    }
+
     res.render("admin/pages/products/detail", {
-      pageTitle: "Chi tiết sản phẩm sản phẩm",
+      pageTitle: "Chi tiết sản phẩm",
       product: product
     });
-  }catch(error) {
+  } catch(error) {
+    console.log("Error finding product:", error);
+    req.flash("error", "Có lỗi xảy ra!");
     res.redirect(`${systemConfig.prefixAdmin}/products`);
   }
 };
 
-// [POST] /admin/products/edit/:id
+// [POST] /admin/products/edit/:id - Xử lý cập nhật sản phẩm
 module.exports.updatePost = async (req, res) => {
   try {
     const id = req.params.id;
+    
     // Validate lại dữ liệu
     if (!req.body.title || req.body.title.trim().length < 2) {
-      req.flash("error", "Tiêu đề không được để trống và phải có ít nhất 8 ký tự!");
-      const backURL = req.header("Referer") || "/admin/products";
-      return res.redirect(backURL);
+      req.flash("error", "Tiêu đề không được để trống và phải có ít nhất 2 ký tự!");
+      return res.redirect(`${systemConfig.prefixAdmin}/products/edit/${id}`);
     }
 
     // Chuyển đổi kiểu dữ liệu
-    req.body.price = parseInt(req.body.price) || 0;
-    req.body.discountPercentage = parseInt(req.body.discountPercentage) || 0;
-    req.body.stock = parseInt(req.body.stock) || 0;
-    req.body.position = parseInt(req.body.position) || 1;
+    const updateData = {
+      title: req.body.title.trim(),
+      description: req.body.description || "",
+      price: parseInt(req.body.price) || 0,
+      discountPercentage: parseInt(req.body.discountPercentage) || 0,
+      stock: parseInt(req.body.stock) || 0,
+      position: parseInt(req.body.position) || 1,
+      status: req.body.status || "active"
+    };
 
     // Nếu có file upload mới thì cập nhật thumbnail
     if (req.file && req.file.cloudinaryUrl) {
-      req.body.thumbnail = req.file.cloudinaryUrl;
+      updateData.thumbnail = req.file.cloudinaryUrl;
     }
 
     // Cập nhật sản phẩm
-    await Product.updateOne(
-      { _id: id },
-      { $set: req.body }
+    const result = await Product.updateOne(
+      { _id: id, deleted: false },
+      { $set: updateData }
     );
 
+    if (result.matchedCount === 0) {
+      req.flash("error", "Không tìm thấy sản phẩm để cập nhật!");
+      return res.redirect(`${systemConfig.prefixAdmin}/products`);
+    }
+
+    req.flash("success", "Cập nhật sản phẩm thành công!");
     res.redirect(`${systemConfig.prefixAdmin}/products`);
+    
   } catch (err) {
+    console.log("Error updating product:", err);
     req.flash("error", "Có lỗi xảy ra khi cập nhật sản phẩm!");
-    const backURL = req.header("Referer") || "/admin/products";
-    res.redirect(backURL);
+    res.redirect(`${systemConfig.prefixAdmin}/products/edit/${req.params.id}`);
   }
 };

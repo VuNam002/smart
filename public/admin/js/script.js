@@ -79,3 +79,31 @@ if(uploadImage) {
   }
 }
 //End Upload Image
+
+// Sort
+const sort = document.querySelector("[sort]");
+if (sort) {
+  const sortSelect = sort.querySelector("[sort-select]");
+  const sortClear = sort.querySelector("[sort-clear]");
+
+  sortSelect.addEventListener("change", (e) => {
+    const value = e.target.value;
+    const [sortKey, sortValue] = value.split("-");
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("sortKey", sortKey);
+    url.searchParams.set("sortValue", sortValue);
+    window.location.href = url.href;
+  });
+
+  // Khi load trang, set selected cho option đúng với sort hiện tại
+  const url = new URL(window.location.href);
+  const currentSortKey = url.searchParams.get("sortKey");
+  const currentSortValue = url.searchParams.get("sortValue");
+  if (currentSortKey && currentSortValue) {
+    const stringSort = `${currentSortKey}-${currentSortValue}`;
+    const optionSelected = sortSelect.querySelector(`option[value='${stringSort}']`);
+    if (optionSelected) optionSelected.selected = true;
+  }
+}
+// End sort

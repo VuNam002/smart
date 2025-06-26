@@ -1,0 +1,18 @@
+mixin sort()
+    div(sort)
+        select(
+            class="form-control"
+            name="sort"
+            sort-select 
+     )
+            option(value="position-desc") Vị trí giảm dần 
+            option(value="position-asc") Vị trí tăng dần 
+            option(value="price-desc" selected=true) Giá giảm dần 
+            option(value="price-asc") Giá tăng dần 
+            option(value="title-asc") Tiêu đề từ A - Z 
+            option(value="title-desc") Tiêu đề từ Z - A 
+
+        button(
+            class="mt-2 btn btn-danger"
+            sort-clear
+        ) Clear

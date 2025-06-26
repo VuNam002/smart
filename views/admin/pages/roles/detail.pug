@@ -1,0 +1,32 @@
+extends ../../layouts/default.pug
+
+block head
+    link(rel="stylesheet", href="/admin/css/detail.css")
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css")
+
+block main
+    .role-detail
+        .container
+            .row.justify-content-center
+                .col-lg-11.col-xl-10
+                    .role-card
+                        if role
+                            // Role Header
+                            .description-section
+                                .description-title Nhóm quyền
+                                .description-content
+                                    .description-text !{role.title}
+                            // Description
+                            if role.description
+                                .description-section
+                                    .description-title Mô tả ngắn
+                                    .description-content
+                                        .description-text !{role.description}
+                        else
+                            .error-state
+                                .error-icon
+                                    i.fas.fa-exclamation-triangle
+                                .error-message
+                                    h4 Không tìm thấy nhóm quyền
+
+    script(src="/admin/js/role.js")

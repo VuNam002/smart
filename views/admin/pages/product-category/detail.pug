@@ -1,0 +1,72 @@
+extends ../../layouts/default.pug
+block head
+    link(rel="stylesheet", href="/admin/css/detail.css")
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css")
+
+block main
+    .product-detail
+        .container
+            .row.justify-content-center
+                .col-lg-11.col-xl-10
+                    .product-card
+                        if product
+                            // Product Header
+                            .product-header
+                                h1= product.title
+
+                            // Main Content
+                            .product-content
+                                // Product Image
+                                if product.thumbnail
+                                    .product-image-section
+                                        img.product-image(
+                                            src=product.thumbnail
+                                            alt=product.title || 'Product Image'
+                                        )
+
+                                // Product Info
+                                .product-info
+                                    // Price
+                                    .info-group.price
+                                        .info-label Giá bán
+                                        .info-value.price-value= product.price ? product.price.toLocaleString() + ' ₫' : '0 ₫'
+
+                                    // Stock
+                                    .info-group.stock
+                                        .info-label Tồn kho
+                                        .info-value.stock-value= (product.stock || 0)
+
+                                    // Discount
+                                    .info-group.discount
+                                        .info-label Giảm giá
+                                        .info-value= (product.discountPercentage || 0) + '%'
+
+                                    // Status
+                                    .info-group.status
+                                        .info-label Trạng thái
+                                        .info-value
+                                            if product.status === 'active'
+                                                span.status-badge.active Hoạt động
+                                            else
+                                                span.status-badge.inactive Dừng hoạt động
+
+                                    // Position
+                                    .info-group.position
+                                        .info-label Vị trí hiển thị
+                                        .info-value= (product.position || 0)
+
+                            // Description
+                            if product.description
+                                .description-section
+                                    .description-title Mô tả sản phẩm
+                                    .description-content
+                                        .description-text !{product.description}
+                        else
+                            .error-state
+                                .error-icon
+                                    i.fas.fa-exclamation-triangle
+                                .error-message
+                                    h4 Không tìm thấy sản phẩm
+                                    p Sản phẩm không tồn tại hoặc đã bị xóa!
+
+        script(src="/admin/js/product.js")

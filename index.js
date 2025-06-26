@@ -1,72 +1,78 @@
-const express = require('express'); 
-const methodOverride = require("method-override"); 
-const bodyParser = require('body-parser'); 
-require("dotenv").config();  
+const express = require("express");
+const methodOverride = require("method-override");
+const path = require("path");
+const bodyParser = require("body-parser");
 
-const session = require('express-session'); 
-const flash = require('connect-flash');  
+require("dotenv").config();
 
-const database = require("./config/database")  
+const session = require("express-session");
+const flash = require("connect-flash");
 
-const route = require("./routes/admin/indexroute"); 
-const routeadmin = require("./routes/client/indexroute") 
-const systemConfig = require("./config/sytem");  
+const database = require("./config/database");
+const route = require("./routes/admin/indexroute");
+const routeadmin = require("./routes/client/indexroute");
+const systemConfig = require("./config/sytem");
+const cookieParser = require("cookie-parser");
 
-database.connect();  
+database.connect();
 
-const app = express(); 
-const port = process.env.PORT || 3000; // Thêm fallback port
 
-app.use(methodOverride('_method')); 
-//parse application/x-www-form-urlencoded 
-app.use(bodyParser.urlencoded({ extended: false}));  
+const app = express();
+const port = process.env.PORT || 3000;
 
-// Thêm session và flash 
-app.use(session({   
-  secret: process.env.SESSION_SECRET || 'your-secret-key', // Sử dụng env variable   
-  resave: false,   
-  saveUninitialized: true 
-})); 
-app.use(flash());  
+app.use(cookieParser()); 
+app.use(methodOverride("_method"));
+app.use(bodyParser.urlencoded({ extended: false }));
 
-// Đưa messages vào res.locals để view pug dùng được 
-app.use((req, res, next) => {   
-  res.locals.messages = req.flash();   
-  next(); 
-});  
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "your-secret-key",
+    resave: false,
+    saveUninitialized: true,
+  }),
+);
+app.use(flash());
 
-app.set("views",`${__dirname}/views`); 
-app.set("view engine", "pug");  
+app.use(
+  "/tinymce",
+  express.static(path.join(__dirname, "node_modules", "tinymce")),
+);
 
-// App Locals Variables 
-app.locals.prefixAdmin = systemConfig.prefixAdmin;   
+app.use((req, res, next) => {
+  res.locals.messages = req.flash();
+  next();
+});
 
-app.use(express.static(`${__dirname}/public`)); //Phải có thế này mới pubic được 
-app.use('/admin', express.static(__dirname + '/public/admin'));  
+app.set("views", `${__dirname}/views`);
+app.set("view engine", "pug");
 
-//Routes 
-route(app); 
-routeadmin(app);    
+app.locals.prefixAdmin = systemConfig.prefixAdmin;
 
-// Export app để Vercel có thể sử dụng
+app.use(express.static(`${__dirname}/public`));
+app.use("/admin", express.static(__dirname + "/public/admin"));
+
+// Routes PHẢI đặt TRƯỚC 404 handler
+route(app);
+routeadmin(app);
+
+// 404 handler - phải đặt SAU routes
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
+
+// Error handling middleware - phải đặt CUỐI CÙNG
+app.use((err, req, res, next) => {
+  console.error("Error details:", err);
+  res.status(500).json({
+    error: "Internal Server Error",
+    message: err.message,
+  });
+});
+
 module.exports = app;
 
-// Chỉ listen khi không phải môi trường production (Vercel)
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(port, () => {   
-    console.log(`Example app listening on port ${port}`) 
-  })
+if (process.env.NODE_ENV !== "production") {
+  app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`);
+  });
 }
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error('Error details:', err);
-    res.status(500).json({ 
-        error: 'Internal Server Error',
-        message: err.message 
-    });
-});
-
-// 404 handler
-app.use((req, res) => {
-    res.status(404).json({ error: 'Route not found' });
-});
