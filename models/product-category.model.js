@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const slug = require("mongoose-slug-updater");
+const { create } = require("./productmodel");
 mongoose.plugin(slug);
 
 const productCategorySchema = new mongoose.Schema({
@@ -16,12 +17,23 @@ const productCategorySchema = new mongoose.Schema({
     slug: "title",
     unique: true
   },
+  createdBy: {
+    account_id: String,
+    createdAt: {
+      type: Date,
+      default: Date.now //lấy ra thời gian hiện t
+    }
+  },
   deleted: {
     type: Boolean,
     default: false
   },//quan tâm đã xóa hay chưa
   thumbnail:String,
-  deleteAt: Date //thời gian xóa
+  deleteAt: Date, //thời gian xóa
+  deletedBy: {
+    account_id: String,
+    deletedAt: Date
+  }
 },{
   timeseries: true
 });

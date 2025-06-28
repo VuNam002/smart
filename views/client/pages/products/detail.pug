@@ -11,7 +11,7 @@ block main
                     p.mt-3 Giá: 
                         strong= product.price ? product.price.toLocaleString() + ' ₫' : '0 ₫'
                     p.mt-2
-                        | Mô tả: #{product.description}
+                        .mt-1 !{product.description}
                     p.mt-2
                         | Số lượng: #{product.stock}
                     p.mt-2
