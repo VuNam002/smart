@@ -2,17 +2,18 @@ extends ../../layouts/default.pug
 
 block main
   h1.mb-4.text-primary.text-center Danh mục sản phẩm
-  
+
   .card.shadow-sm.rounded-4
     .card-header.bg-primary.text-white.font-weight-bold.rounded-top-4.d-flex.justify-content-between.align-items-center
-      span Danh mục sản phẩm
-      a(
-        href=`${prefixAdmin}/product-category/create`
-        class="btn btn-success btn-sm fw-bold"
-      )
-        i.fas.fa-plus.me-1
-        | Thêm mới
-    
+      span.mb-0 Danh mục sản phẩm
+      if user && user.role && user.role.permissions && user.role.permissions.includes("product-category_create")
+        a(
+          href=`${prefixAdmin}/product-category/create`
+          class="px-4 ml-auto btn btn-success btn-sm fw-bold"
+        )
+          i.fas.fa-plus.me-1
+          | Thêm mới
+
     .card-body.p-0
       .table-responsive
         table.table.table-hover.table-bordered.mb-0.rounded-bottom-4#checkbox-nulti
@@ -58,6 +59,7 @@ block main
                       form="form-change-position"
                     )
                   td
+                    if user && user.role && user.role.permissions && user.role.permissions.includes("product-category_edit")
                       button.badge(
                         type="button"
                         data-status=item.status
@@ -68,25 +70,28 @@ block main
                       )
                         = item.status == "active" ? "Hoạt động" : "Dừng hoạt động"
                   td.text-center.align-middle
-                    a.btn.btn-warning.btn-sm.me-1(
-                      href=`${prefixAdmin}/product-category/edit/${item._id}`
-                    )
-                      i.fas.fa-edit.me-1
-                      | Sửa
-                    a.btn.btn-secondary.btn-sm.me-1(
-                      href=`${prefixAdmin}/product-category/detail/${item._id}`
-                    )
-                      i.fas.fa-eye.me-1
-                      | Chi tiết
-                    button.btn.btn-danger.btn-sm.ms-1(
-                      type="button"
-                      button-delete
-                      data-id=item._id
-                    )
-                      i.fas.fa-trash.me-1
-                      | Xóa
-      
-      .d-flex.justify-content-end.p-3.bg-light
+                    if user && user.role && user.role.permissions && user.role.permissions.includes("product-category_edit")
+                      a.btn.btn-warning.btn-sm.me-1(
+                        href=`${prefixAdmin}/product-category/edit/${item._id}`
+                      )
+                        i.fas.fa-edit.me-1
+                        | Sửa
+                      a.btn.btn-secondary.btn-sm.me-1(
+                        href=`${prefixAdmin}/product-category/detail/${item._id}`
+                      )
+                        i.fas.fa-eye.me-1
+                        | Chi tiết
+                    if user && user.role && user.role.permissions && user.role.permissions.includes("product-category_delete")
+                      button.btn.btn-danger.btn-sm.ms-1(
+                        type="button"
+                        button-delete
+                        data-id=item._id
+                      )
+                        i.fas.fa-trash.me-1
+                        | Xóa
+
+  .d-flex.justify-content-end.p-3.bg-light
+
   form#form-change-status(
     action=""
     method="POST"
@@ -100,4 +105,5 @@ block main
     method="POST"
     id="form-delete-item"
   )
+
   script(src="/admin/js/product.js")

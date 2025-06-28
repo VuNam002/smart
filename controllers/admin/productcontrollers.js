@@ -3,6 +3,8 @@ const filterStatusHelpers = require("../../helpers/filterStatus");
 const searchHelpers = require("../../helpers/search");
 const paginationHelpers = require("../../helpers/pagination");
 const systemConfig = require("../../config/sytem");
+const Category = require("../../models/product-category.model");
+const Account = require("../../models/account.model");
 
 // [GET] /admin/product
 module.exports.index = async (req, res) => {
@@ -27,7 +29,7 @@ module.exports.index = async (req, res) => {
       limitItems: 4,
     },
     req.query,
-    countProducts
+    countProducts,
   );
 
   // Sort
@@ -43,6 +45,15 @@ module.exports.index = async (req, res) => {
     .sort(sort)
     .skip(objectPagination.skip)
     .limit(objectPagination.limitItems);
+
+  for (const product of products) {
+    const user = await Account.findOne({
+      _id: product.createdBy.account_id,
+    });
+    if(user) {
+      product.accountfullName = user.fullName;
+    }
+  }
 
   res.render("admin/pages/products/index", {
     pageTitle: "Trang sản phẩm",
@@ -71,13 +82,13 @@ module.exports.changeNulti = async (req, res) => {
 
   switch (type) {
     case "active":
-      await Product.updateMany({_id: { $in: ids}}, {status: "active"});  
+      await Product.updateMany({ _id: { $in: ids } }, { status: "active" });
       break;
     case "inactive":
-      await Product.updateMany({_id: { $in: ids}}, {status: "inactive"});
+      await Product.updateMany({ _id: { $in: ids } }, { status: "inactive" });
       break;
     case "delete":
-      await Product.updateMany({_id: { $in: ids}}, {deleted: true});
+      await Product.updateMany({ _id: { $in: ids } }, { deleted: true });
       break;
     default:
       break;
@@ -88,28 +99,32 @@ module.exports.changeNulti = async (req, res) => {
 };
 
 // [DELETE] /admin/products/delete/:id đây là xóa mềm
-// module.exports.deleteItem = async (req, res) => {
-//   const id = req.params.id;
-
-//   await Product.updateOne({_id: id}, {
-//     deleted: true,
-//     deleteAt: new Date()
-//   });
-
-//   const backURL = req.header("Referer") || "/admin/products";
-//   res.redirect(backURL);
-// };
-
-// [DELETE] /admin/products/delete/:id  đây là xóa cứng
 module.exports.deleteItem = async (req, res) => {
   const id = req.params.id;
 
-  // XÓA CỨNG: Xóa luôn khỏi database
-  await Product.deleteOne({ _id: id });
+  await Product.updateOne({_id: id}, {
+    deleted: true,
+    // deleteAt: new Date()
+    deletedBy: {
+      account_id: res.locals.user._id,
+      deletedAt: new Date()
+    }
+  });
 
   const backURL = req.header("Referer") || "/admin/products";
   res.redirect(backURL);
 };
+
+// [DELETE] /admin/products/delete/:id  đây là xóa cứng
+// module.exports.deleteItem = async (req, res) => {
+//   const id = req.params.id;
+
+//   // XÓA CỨNG: Xóa luôn khỏi database
+//   await Product.deleteOne({ _id: id });
+
+//   const backURL = req.header("Referer") || "/admin/products";
+//   res.redirect(backURL);
+// };
 
 // [PATCH] /admin/products/change-position
 module.exports.changePosition = async (req, res) => {
@@ -137,8 +152,10 @@ module.exports.changePosition = async (req, res) => {
 
 // [GET] /admin/products/create
 module.exports.create = async (req, res) => {
+  const records = await Category.find({});
   res.render("admin/pages/products/create", {
     pageTitle: "Thêm mới sản phẩm",
+    records,
   });
 };
 
@@ -168,6 +185,11 @@ module.exports.createPost = async (req, res) => {
     req.body.thumbnail = req.file.cloudinaryUrl;
   }
 
+  req.body.createdBy = {
+    account_id: res.locals.user._id,
+    createdAt: new Date(),
+  };
+
   try {
     const product = new Product(req.body);
     await product.save();
@@ -186,7 +208,7 @@ module.exports.edit = async (req, res) => {
   try {
     const find = {
       deleted: false,
-      _id: req.params.id
+      _id: req.params.id,
     };
     const product = await Product.findOne(find);
 
@@ -196,7 +218,7 @@ module.exports.edit = async (req, res) => {
     }
     res.render("admin/pages/products/edit", {
       pageTitle: "Chỉnh sửa sản phẩm",
-      product: product
+      product: product,
     });
   } catch (err) {
     console.log("Error finding product:", err);
@@ -210,7 +232,7 @@ module.exports.detail = async (req, res) => {
   try {
     const find = {
       deleted: false,
-      _id: req.params.id
+      _id: req.params.id,
     };
     const product = await Product.findOne(find);
 
@@ -221,9 +243,9 @@ module.exports.detail = async (req, res) => {
 
     res.render("admin/pages/products/detail", {
       pageTitle: "Chi tiết sản phẩm",
-      product: product
+      product: product,
     });
-  } catch(error) {
+  } catch (error) {
     console.log("Error finding product:", error);
     req.flash("error", "Có lỗi xảy ra!");
     res.redirect(`${systemConfig.prefixAdmin}/products`);
@@ -234,10 +256,13 @@ module.exports.detail = async (req, res) => {
 module.exports.updatePost = async (req, res) => {
   try {
     const id = req.params.id;
-    
+
     // Validate lại dữ liệu
     if (!req.body.title || req.body.title.trim().length < 2) {
-      req.flash("error", "Tiêu đề không được để trống và phải có ít nhất 2 ký tự!");
+      req.flash(
+        "error",
+        "Tiêu đề không được để trống và phải có ít nhất 2 ký tự!",
+      );
       return res.redirect(`${systemConfig.prefixAdmin}/products/edit/${id}`);
     }
 
@@ -249,7 +274,7 @@ module.exports.updatePost = async (req, res) => {
       discountPercentage: parseInt(req.body.discountPercentage) || 0,
       stock: parseInt(req.body.stock) || 0,
       position: parseInt(req.body.position) || 1,
-      status: req.body.status || "active"
+      status: req.body.status || "active",
     };
 
     // Nếu có file upload mới thì cập nhật thumbnail
@@ -260,7 +285,7 @@ module.exports.updatePost = async (req, res) => {
     // Cập nhật sản phẩm
     const result = await Product.updateOne(
       { _id: id, deleted: false },
-      { $set: updateData }
+      { $set: updateData },
     );
 
     if (result.matchedCount === 0) {
@@ -270,7 +295,6 @@ module.exports.updatePost = async (req, res) => {
 
     req.flash("success", "Cập nhật sản phẩm thành công!");
     res.redirect(`${systemConfig.prefixAdmin}/products`);
-    
   } catch (err) {
     console.log("Error updating product:", err);
     req.flash("error", "Có lỗi xảy ra khi cập nhật sản phẩm!");

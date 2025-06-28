@@ -10,6 +10,8 @@ html
         block head
 
     body 
+
+      if(user.role.permissions.length > 0)  
         include ../partials/header.pug
 
         .body   
@@ -38,3 +40,5 @@ html
         script(src="/admin/js/tinymce-config.js")
 
         script(src="/admin/js/script.js")
+      else
+        h1 Bạn không có truyền truy cập

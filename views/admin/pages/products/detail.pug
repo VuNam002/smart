@@ -54,6 +54,13 @@ block main
                                     .info-group.position
                                         .info-label Vị trí hiển thị
                                         .info-value= (product.position || 0)
+                                    
+                                    //categiry
+                                    .info-group.category
+                                        .info-label Danh mục
+                                        .info-value= product.product_category_id || 'Không có danh mục'
+
+
 
                             // Description
                             if product.description

@@ -2,6 +2,7 @@ const express = require("express");
 const methodOverride = require("method-override");
 const path = require("path");
 const bodyParser = require("body-parser");
+const moment = require("moment");
 
 require("dotenv").config();
 
@@ -47,6 +48,8 @@ app.set("views", `${__dirname}/views`);
 app.set("view engine", "pug");
 
 app.locals.prefixAdmin = systemConfig.prefixAdmin;
+app.locals.moment = moment;
+
 
 app.use(express.static(`${__dirname}/public`));
 app.use("/admin", express.static(__dirname + "/public/admin"));

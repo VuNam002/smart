@@ -1,15 +1,26 @@
 .sider
-    .inner-menu     
-        ul 
-            li 
-                a(href=`${prefixAdmin}/dashboard`) Tổng quan 
-            li 
-                a(href=`${prefixAdmin}/product-category`) Danh mục sản phẩm 
-            li 
-                a(href=`${prefixAdmin}/products`) Danh sách sản phẩm
+    .inner-menu         
+        ul
             li
-                a(href=`${prefixAdmin}/roles`) Nhóm quyền
-            li
-                a(href=`${prefixAdmin}/roles/permissions`) Phân quyền 
-            li
-                a(href=`${prefixAdmin}/accounts`) Danh sách tài khoản
+                a(href=`${prefixAdmin}/dashboard`) Tổng quan
+                        
+            if (user.role.permissions.includes("product-category_view"))
+                li
+                    a(href=`${prefixAdmin}/product-category`) Danh mục sản phẩm
+                     
+            if(user.role.permissions.includes("product_view"))
+                li
+                    a(href=`${prefixAdmin}/products`) Danh sách sản phẩm
+            if(user.role.permissions.includes("accounts_view"))
+                li
+                    a(href=`${prefixAdmin}/accounts`) Tài khoản
+            if(user.role.permissions.includes("roles_view"))
+                li
+                    a(href=`${prefixAdmin}/roles`) Nhóm quyền
+            
+            if(user.role.permissions.includes("roles_permissions"))
+                li
+                    a(href=`${prefixAdmin}/roles/permissions`) Phân quyền
+            if(user.role.permissions.includes("roles_create"))
+                li
+                    a(href=`${prefixAdmin}/accounts`) Danh sách tài khoản
