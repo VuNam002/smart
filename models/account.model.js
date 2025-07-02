@@ -20,9 +20,14 @@ const accountSchema = new mongoose.Schema(
       },
       deletedAt: Date,
     },
-  {
-    timestamps: true,
-  },
+    {
+      timestamps: true,
+      
+    },
+    {
+      updateBy: String,
+      updateAt: Date
+    }
 );
 
 const Account = mongoose.model("Account", accountSchema, "account");

@@ -1,0 +1,58 @@
+extends ../../layouts/default.pug
+block head
+    link(rel="stylesheet", href="/admin/css/detail.css")
+    link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css")
+
+block main
+    .article-detail
+        .container
+            .row.justify-content-center
+                .col-lg-11.col-xl-10
+                    .article-card
+                        if article
+                            // article Header
+                            .article-header
+                                h1= article.title
+
+                            // Main Content
+                            .article-content
+                                // article Image
+                                if article.thumbnail
+                                    .article-image-section
+                                        img.article-image(
+                                            src=article.thumbnail
+                                            alt=article.title || 'article Image'
+                                        )
+
+                                // article Info
+                                .article-info
+                                   
+                                    // Status
+                                    .info-group.status
+                                        .info-label Trạng thái
+                                        .info-value
+                                            if article.status === 'active'
+                                                span.status-badge.active Hoạt động
+                                            else
+                                                span.status-badge.inactive Dừng hoạt động
+
+                                    // Position
+                                    .info-group.position
+                                        .info-label Vị trí hiển thị
+                                        .info-value= (article.position || 0)
+
+                            // Description
+                            if article.description
+                                .description-section
+                                    .description-title Mô tả bài viết
+                                    .description-content
+                                        .description-text !{article.description}
+                        else
+                            .error-state
+                                .error-icon
+                                    i.fas.fa-exclamation-triangle
+                                .error-message
+                                    h4 Không tìm thấy sản phẩm
+                                    p Sản phẩm không tồn tại hoặc đã bị xóa!
+
+        script(src="/admin/js/article.js")

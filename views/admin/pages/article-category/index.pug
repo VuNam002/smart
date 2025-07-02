@@ -1,0 +1,111 @@
+extends ../../layouts/default.pug
+include ../../mixins/moment.pug
+
+block main
+  h1.mb-4.text-primary.text-center Danh mục bài viết
+
+  .card.shadow-sm.rounded-4
+    .card-header.bg-primary.text-white.font-weight-bold.rounded-top-4.d-flex.justify-content-between.align-items-center
+       a.btn.btn-success.btn-sm(
+        href=`${prefixAdmin}/article-category/create`
+      )
+        i.fas.fa-plus.me-1
+        | Thêm mới
+    .card-body.p-0
+      .table-responsive
+        table.table.table-hover.table-bordered.mb-0.rounded-bottom-4#checkbox-nulti
+          thead.table-secondary
+            tr
+              th.text-center.align-middle.px-2
+              th.text-center.align-middle(style="width:50px") STT
+              th.text-center.align-middle Hình ảnh
+              th.text-center.align-middle Tiêu đề
+              th.text-center.align-middle Vị trí
+              th.text-center.align-middle Trạng thái
+              th.text-center.align-middle Người tạo
+              th.text-center.align-middle Hành động
+          tbody
+            if recods.length === 0
+              tr
+                td.text-center.text-muted(colspan="7") Không có danh mục nào.
+            else
+              each item, index in recods
+                tr
+                  td.text-center.align-middle
+                  td.text-center.align-middle #{index + 1}
+                  td.text-center.align-middle
+                    if item.thumbnail
+                      img(
+                        src=item.thumbnail
+                        alt=item.title
+                        width="50"
+                        height="50"
+                        style="object-fit:cover;border-radius:8px;border:1px solid #eee;"
+                      )
+                    else
+                      span.text-muted Không có ảnh
+                  td.align-middle #{item.title}
+                  td.align-middle
+                    input.form-control.form-control-sm.d-inline-block(
+                      type="number"
+                      value=item.position
+                      style="width:60px"
+                      min="1"
+                      name=`positions[${item._id}]`
+                      form="form-change-position"
+                    )
+                  td
+              
+                      button.badge(
+                        type="button"
+                        data-status=item.status
+                        data-id=item._id
+                        class=(item.status == "active" ? "bg-success text-white" : "bg-danger text-white")
+                        style="cursor:pointer;min-width:90px"
+                        button-change-status
+                      )
+                        = item.status == "active" ? "Hoạt động" : "Dừng hoạt động"
+                  td 
+                    p #{item.accountfullName}
+                    p.text-muted.text-sm
+                      +formatDateTime(item.createdAt)
+
+                  
+                  td.text-center.align-middle
+                  
+                      a.btn.btn-warning.btn-sm.me-1(
+                        href=`${prefixAdmin}/article-category/edit/${item._id}`
+                      )
+                        i.fas.fa-edit.me-1
+                        | Sửa
+                      a.btn.btn-secondary.btn-sm.me-1(
+                        href=`${prefixAdmin}/article-category/detail/${item._id}`
+                      )
+                        i.fas.fa-eye.me-1
+                        | Chi tiết
+   
+                      button.btn.btn-danger.btn-sm.ms-1(
+                        type="button"
+                        button-delete
+                        data-id=item._id
+                      )
+                        i.fas.fa-trash.me-1
+                        | Xóa
+
+  .d-flex.justify-content-end.p-3.bg-light
+
+  form#form-change-status(
+    action=""
+    method="POST"
+    data-path=`${prefixAdmin}/article-category/change-status`
+    style="display:none"
+  )
+
+  form(
+    action=""
+    data-path=`${prefixAdmin}/article-category/delete`
+    method="POST"
+    id="form-delete-item"
+  )
+
+  script(src="/admin/js/product.js")

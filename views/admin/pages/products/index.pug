@@ -106,11 +106,10 @@ block main
                         if(user.role.permissions.includes("product_edit"))
                           a.btn.btn-warning.btn-sm.me-1(
                             href=`${prefixAdmin}/products/edit/${item._id}`
-                          ) Sửa
-                        if(user.role.permissions.includes("product_detail"))
+                            ) Sửa
                           a.btn.btn-secondary.btn-sm.me-1(
                             href=`${prefixAdmin}/products/detail/${item._id}`
-                          ) Chi tiết
+                            ) Chi tiết
                         if(user.role.permissions.includes("product_delete"))
                           button.btn.btn-danger.btn-sm.ms-1(
                             type="button"

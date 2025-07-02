@@ -21,7 +21,7 @@ const productCategorySchema = new mongoose.Schema({
     account_id: String,
     createdAt: {
       type: Date,
-      default: Date.now //lấy ra thời gian hiện t
+      default: Date.now
     }
   },
   deleted: {

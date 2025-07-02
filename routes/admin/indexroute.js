@@ -7,6 +7,9 @@ const productCategoryRoutes = require("./product-category");
 const roleRoutes = require("./roleRoute");
 const accountRoutes = require("./accountRoute");
 const authRoutes = require("./authRoute");
+const articleCategoryRoutes = require("./article-categoryRoute");
+
+
 
 module.exports = (app) => {
   const PATH_ADMIN = sytemConfig.prefixAdmin;
@@ -20,4 +23,5 @@ module.exports = (app) => {
   app.use(PATH_ADMIN + "/roles", authMiddleware.requireAuth,roleRoutes);
   app.use(PATH_ADMIN + "/accounts", authMiddleware.requireAuth,accountRoutes);
   app.use(PATH_ADMIN + "/auth", authRoutes);// chứa các route đăng nhập đăng xuất nên ko cần app
+  app.use(PATH_ADMIN + "/article-category",authMiddleware.requireAuth,articleCategoryRoutes);
 };

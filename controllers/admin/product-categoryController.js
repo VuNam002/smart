@@ -1,5 +1,7 @@
 const ProductCategory = require("../../models/product-category.model");
 const systemConfig = require("../../config/sytem");
+const Account = require("../../models/account.model");
+
 
 // Hàm tạo cây phân cấp chung
 function createTree(arr, parentId = "") {
@@ -30,8 +32,17 @@ async function handlePosition(reqBody) {
 module.exports.index = async (req, res) => {
   try {
     const find = { deleted: false };
-    const recods = await ProductCategory.find(find);
-    
+    const recods = await ProductCategory.find(find).lean(); // ✅ thêm .lean()
+
+    for (const product of recods) {
+      if (product.createdBy && product.createdBy.account_id) {
+        const user = await Account.findOne({ _id: product.createdBy.account_id }).lean(); // không bắt buộc .lean() ở đây nhưng nên dùng
+        if (user) {
+          product.accountfullName = user.fullName;
+        }
+      }
+    }
+
     res.render("admin/pages/product-category/index", {
       pageTitle: "Danh mục sản phẩm",
       recods: recods,
@@ -41,6 +52,7 @@ module.exports.index = async (req, res) => {
     res.redirect(`${systemConfig.prefixAdmin}/product-category`);
   }
 };
+
 
 // GET /admin/product-category/create
 module.exports.create = async (req, res) => {
@@ -63,6 +75,11 @@ module.exports.create = async (req, res) => {
 module.exports.updatePost = async (req, res) => {
   try {
     await handlePosition(req.body);
+    req.body.createdBy = {
+      account_id: res.locals.user._id,
+      createdAt: new Date(),
+    };
+
 
     const record = new ProductCategory(req.body);
     await record.save();
@@ -77,6 +94,18 @@ module.exports.updatePost = async (req, res) => {
 };
 
 // GET /admin/product-category/edit/:id
+// Tìm tất cả con cháu theo parent_id
+function findAllChildrenIds(records, parentId) {
+  let ids = [];
+  for (const item of records) {
+    if (String(item.parent_id) === String(parentId)) {
+      ids.push(item._id);
+      ids = ids.concat(findAllChildrenIds(records, item._id));
+    }
+  }
+  return ids;
+}
+
 module.exports.edit = async (req, res) => {
   try {
     const id = req.params.id;
@@ -84,20 +113,24 @@ module.exports.edit = async (req, res) => {
     const data = await ProductCategory.findOne({
       _id: id,
       deleted: false,
-    });
+    }).lean(); 
 
     if (!data) {
       req.flash("error", "Không tìm thấy danh mục!");
       return res.redirect(`${systemConfig.prefixAdmin}/product-category`);
     }
 
-    // Loại trừ chính nó và các con của nó để tránh circular reference
-    const allRecords = await ProductCategory.find({
-      deleted: false,
-      _id: { $ne: id },
-    }).lean();
+    const allRecords = await ProductCategory.find({ deleted: false }).lean();
+    const childrenIds = findAllChildrenIds(allRecords, id);
+    const idsToExclude = [id, ...childrenIds].map(x => String(x));
+    const currentParentId = String(data.parent_id || "");
 
-    const records = createTree(allRecords);
+    const filteredRecords = allRecords.filter(item => {
+      const itemId = String(item._id);
+      return !idsToExclude.includes(itemId) || itemId === currentParentId;
+    });
+
+    const records = createTree(filteredRecords);
 
     res.render("admin/pages/product-category/edit", {
       pageTitle: "Chỉnh sửa danh mục sản phẩm",
@@ -110,7 +143,6 @@ module.exports.edit = async (req, res) => {
     res.redirect(`${systemConfig.prefixAdmin}/product-category`);
   }
 };
-
 
 // DELETE /admin/product-category/delete/:id 
 module.exports.deleteItem = async (req, res) => {
