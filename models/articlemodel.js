@@ -1,21 +1,19 @@
 const mongoose = require("mongoose");
 const slug = require("mongoose-slug-updater");
+const { create } = require("./productmodel");
 mongoose.plugin(slug);
 
-const productSchema = new mongoose.Schema(
+const articleSchema = new mongoose.Schema(
   {
     title: String,
-    product_category_id: {
+    article_category_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "ProductCategory",
+      ref: "ArticleCategory",
       required: true,
     },
-
     description: String,
-    price: Number,
-    discountPercentage: Number,
-    stock: Number,
-    status: String, //quan tâm
+    content: String,
+    status: String,
     position: Number,
     slug: {
       type: String,
@@ -26,25 +24,26 @@ const productSchema = new mongoose.Schema(
       account_id: String,
       createdAt: {
         type: Date,
-        default: Date.now, //lấy ra thời gian hiện t
+        default: Date.now,
       },
     },
     deleted: {
       type: Boolean,
       default: false,
-    }, //quan tâm đã xóa hay chưa
+    },
     thumbnail: String,
-    deleteAt: Date, //thời gian xóa
+    deleteAt: Date,
     deletedBy: {
       account_id: String,
-      deletedAt: Date
-    }
+      deletedAt: Date,
+    },
   },
   {
     timeseries: true,
   },
 );
 
-const Product = mongoose.model("Product", productSchema, "products");
+const Article = mongoose.model("Article", articleSchema, "articles");
 
-module.exports = Product;
+module.exports = Article;
+

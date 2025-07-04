@@ -1,4 +1,3 @@
-
 extends ../../layouts/default.pug
 include ../../mixins/alert.pug
 
@@ -282,8 +281,9 @@ block main
                                 data-role-id=item._id
                                 checked=isChecked
                             )
+
         // Bảng 6: Danh mục bài viết
-        h4(class="mt-4 mb-3") Danh sách bài viết
+        h4(class="mt-4 mb-3") Danh mục bài viết
         table(
             class="table table-hover table-sm"
             table-permissions
@@ -343,6 +343,66 @@ block main
                                 checked=isChecked
                             )
 
+        // Bảng 7: Danh sách bài viết
+        h4(class="mt-4 mb-3") Danh sách bài viết
+        table(
+            class="table table-hover table-sm"
+            table-permissions
+        )
+            thead
+                tr
+                    th Tính năng
+                    each item in records
+                        th(class="text-center" data-id=item._id) #{item.title}
+            tbody
+                tr(data-name="articles_view")
+                    td Xem
+                    each item in records
+                        td(class="text-center")
+                            - const isChecked = item.permissions && item.permissions.includes("articles_view")
+                            input(
+                                type="checkbox" 
+                                name="permissions"
+                                value="articles_view"
+                                data-role-id=item._id
+                                checked=isChecked
+                            )
+                tr(data-name="articles_create")
+                    td Thêm mới
+                    each item in records
+                        td(class="text-center")
+                            - const isChecked = item.permissions && item.permissions.includes("articles_create")
+                            input(
+                                type="checkbox" 
+                                name="permissions"
+                                value="articles_create"
+                                data-role-id=item._id
+                                checked=isChecked
+                            )
+                tr(data-name="articles_edit")
+                    td Chỉnh sửa
+                    each item in records
+                        td(class="text-center")
+                            - const isChecked = item.permissions && item.permissions.includes("articles_edit")
+                            input(
+                                type="checkbox" 
+                                name="permissions"
+                                value="articles_edit"
+                                data-role-id=item._id
+                                checked=isChecked
+                            )
+                tr(data-name="articles_delete")
+                    td Xóa
+                    each item in records
+                        td(class="text-center")
+                            - const isChecked = item.permissions && item.permissions.includes("articles_delete")
+                            input(
+                                type="checkbox" 
+                                name="permissions"
+                                value="articles_delete"
+                                data-role-id=item._id
+                                checked=isChecked
+                            )
 
     form(
         id="form-change-permissions"

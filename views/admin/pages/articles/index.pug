@@ -1,0 +1,127 @@
+extends ../../layouts/default.pug
+include ../../mixins/filterStatus.pug
+include ../../mixins/search.pug
+include ../../mixins/pagination.pug
+include ../../mixins/form-change-mutil.pug
+include ../../mixins/moment.pug
+
+block main
+  if(user.role.permissions.includes("articles_create"))
+    h1.mb-4.text-primary Trang danh sách bài viết
+
+    .card.mb-4.shadow-sm
+      .card-header.bg-light.font-weight-bold Bộ lọc và tìm kiếm
+      .card-body
+        .row.g-3.align-items-center
+          .col-12.col-md-6
+            +filterStatus(filterStatus)
+          .col-12.col-md-6
+            +search(keyword)
+
+    .card.shadow-sm
+      .card-header.bg-light.font-weight-bold Danh sách bài viết
+      .card-body.p-0
+        .row 
+          .col-8
+            +form-change-mutil(`${prefixAdmin}/articles/change-nulti?_method=PATCH`)
+          .col-4.d-flex.justify-content-end.align-items-center
+            if(user.role.permissions.includes("articles_create"))
+              a(
+                href=`${prefixAdmin}/articles/create`
+                class="px-4 btn btn-success btn-sm fw-bold"
+              ) Thêm mới
+
+        form#form-change-position(
+          action=`${prefixAdmin}/articles/change-position?_method=PATCH`
+          method="POST"
+        )
+          .table-responsive
+            table.table.table-hover.table-bordered.mb-0#checkbox-nulti
+              thead.table-secondary
+                tr
+                  th.text-center
+                    input(type="checkbox" name="checkall")
+                  th.text-center(style="width:50px") STT
+                  th.text-center Hình ảnh
+                  th.text-center Tiêu đề
+                  th.text-center Vị trí
+                  th.text-center Trạng thái
+                  th.text-center Người tạo
+                  th.text-center Hành động
+              tbody
+                if articles.length === 0
+                  tr
+                    td.text-center.text-muted(colspan="8") Không có sản phẩm nào.
+                else
+                  each item, index in articles
+                    tr
+                      td.text-center
+                        input(type="checkbox" name="ids" value=item._id form="form-change-position")
+                      td.text-center #{index + 1}
+                      td.text-center
+                        img(
+                          src=item.thumbnail
+                          alt=item.title
+                          width="50"
+                          height="50"
+                          style="object-fit:cover;border-radius:6px;"
+                        )
+                      td #{item.title}
+                      td 
+                        input(
+                          type="number"
+                          value = item.position
+                          style = "width:60px"
+                          min="1"
+                          name= `positions[${item._id}]`
+                          form="form-change-position"
+                        )
+                      td
+                        button.badge(
+                          type="button"
+                          data-status=item.status
+                          data-id=item._id
+                          class=(item.status == "active" ? "bg-success text-white" : "bg-danger text-white")
+                          style="cursor:pointer;min-width:90px"
+                          button-change-status
+                        )
+                          = item.status == "active" ? "Hoạt động" : "Dừng hoạt động"
+
+                      td 
+                        p #{item.accountfullName}
+                        p 
+                          +formatDateTime(item.createdBy.createdAt)
+
+                      td.text-center
+                        if(user.role.permissions.includes("articles_edit"))
+                          a.btn.btn-warning.btn-sm.me-1(
+                            href=`${prefixAdmin}/articles/edit/${item._id}`
+                            ) Sửa
+                          a.btn.btn-secondary.btn-sm.me-1(
+                            href=`${prefixAdmin}/articles/detail/${item._id}`
+                            ) Chi tiết
+                        if(user.role.permissions.includes("articles_delete"))
+                          button.btn.btn-danger.btn-sm.ms-1(
+                            type="button"
+                            button-delete
+                            data-id=item._id
+                          ) Xóa
+            
+    .mt-4
+      +pagination(pagination, keyword)
+
+    form#form-change-status(
+      action=""
+      method="POST"
+      data-path=`${prefixAdmin}/articles/change-status`
+      style="display:none"
+    )
+
+    form(
+      action = ""
+      method = "POST"
+      id = "form-delete-item"
+      data-path=`${prefixAdmin}/articles/delete`
+    )
+
+    script(src="/admin/js/product.js")

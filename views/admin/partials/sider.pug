@@ -21,10 +21,13 @@
             if(user.role.permissions.includes("roles_permissions"))
                 li
                     a(href=`${prefixAdmin}/roles/permissions`) Phân quyền
-            if(user.role.permissions.includes("roles_create"))
+            if(user.role.permissions.includes("accounts_view"))
                 li
                     a(href=`${prefixAdmin}/accounts`) Danh sách tài khoản
-                
+            if(user.role.permissions.includes("articles-category_view"))
                 li  
                     a(href=`${prefixAdmin}/article-category`) Danh mục bài viết
+            if(user.role.permissions.includes("articles_view"))
+                li 
+                    a(href=`${prefixAdmin}/articles`) Danh sách bài viết
     

@@ -32,7 +32,7 @@ router.patch(
     uploadCloudinary,
     controller.editPatch
 )
-router.delete("/delete/:id", controller.deleteItem);
+
 
 
 

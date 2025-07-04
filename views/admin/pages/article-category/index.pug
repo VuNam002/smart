@@ -2,110 +2,156 @@ extends ../../layouts/default.pug
 include ../../mixins/moment.pug
 
 block main
-  h1.mb-4.text-primary.text-center Danh mục bài viết
-
-  .card.shadow-sm.rounded-4
-    .card-header.bg-primary.text-white.font-weight-bold.rounded-top-4.d-flex.justify-content-between.align-items-center
-       a.btn.btn-success.btn-sm(
-        href=`${prefixAdmin}/article-category/create`
-      )
-        i.fas.fa-plus.me-1
-        | Thêm mới
-    .card-body.p-0
-      .table-responsive
-        table.table.table-hover.table-bordered.mb-0.rounded-bottom-4#checkbox-nulti
-          thead.table-secondary
-            tr
-              th.text-center.align-middle.px-2
-              th.text-center.align-middle(style="width:50px") STT
-              th.text-center.align-middle Hình ảnh
-              th.text-center.align-middle Tiêu đề
-              th.text-center.align-middle Vị trí
-              th.text-center.align-middle Trạng thái
-              th.text-center.align-middle Người tạo
-              th.text-center.align-middle Hành động
-          tbody
-            if recods.length === 0
+  // Kiểm tra quyền xem danh mục bài viết
+  if(user.role.permissions.includes("articles-category_view"))
+    h1.mb-4.text-primary.text-center Danh mục bài viết
+    .card.shadow-sm.rounded-4
+      .card-header.bg-primary.text-white.font-weight-bold.rounded-top-4.d-flex.justify-content-between.align-items-center
+        span Danh sách danh mục
+        // Kiểm tra quyền thêm mới
+        if(user.role.permissions.includes("articles-category_create"))
+          a.btn.btn-success.btn-sm(
+            href=`${prefixAdmin}/article-category/create`
+            class="px-4 ml-auto btn btn-success btn-sm fw-bold"
+          )
+            i.fas.fa-plus.me-1
+            | Thêm mới
+      .card-body.p-0
+        .table-responsive
+          table.table.table-hover.table-bordered.mb-0.rounded-bottom-4#checkbox-multi
+            thead.table-secondary
               tr
-                td.text-center.text-muted(colspan="7") Không có danh mục nào.
-            else
-              each item, index in recods
+                // Chỉ hiển thị checkbox nếu có quyền xóa
+                if(user.role.permissions.includes("articles-category_delete"))
+                  th.text-center.align-middle.px-2
+                    input.form-check-input(type="checkbox" id="checkAll")
+                th.text-center.align-middle(style="width:50px") STT
+                th.text-center.align-middle Hình ảnh
+                th.text-center.align-middle Tiêu đề
+                th.text-center.align-middle Vị trí
+                th.text-center.align-middle Trạng thái
+                th.text-center.align-middle Người tạo
+                th.text-center.align-middle Hành động
+            tbody
+              if recods.length === 0
                 tr
-                  td.text-center.align-middle
-                  td.text-center.align-middle #{index + 1}
-                  td.text-center.align-middle
-                    if item.thumbnail
-                      img(
-                        src=item.thumbnail
-                        alt=item.title
-                        width="50"
-                        height="50"
-                        style="object-fit:cover;border-radius:8px;border:1px solid #eee;"
-                      )
-                    else
-                      span.text-muted Không có ảnh
-                  td.align-middle #{item.title}
-                  td.align-middle
-                    input.form-control.form-control-sm.d-inline-block(
-                      type="number"
-                      value=item.position
-                      style="width:60px"
-                      min="1"
-                      name=`positions[${item._id}]`
-                      form="form-change-position"
-                    )
-                  td
-              
-                      button.badge(
-                        type="button"
-                        data-status=item.status
-                        data-id=item._id
-                        class=(item.status == "active" ? "bg-success text-white" : "bg-danger text-white")
-                        style="cursor:pointer;min-width:90px"
-                        button-change-status
-                      )
-                        = item.status == "active" ? "Hoạt động" : "Dừng hoạt động"
-                  td 
-                    p #{item.accountfullName}
-                    p.text-muted.text-sm
-                      +formatDateTime(item.createdAt)
+                  - const colspanValue = user.role.permissions.includes("articles-category_delete") ? 8 : 7
+                  td.text-center.text-muted(colspan=colspanValue) Không có danh mục nào.
+              else
+                each item, index in recods
+                  tr
+                    // Chỉ hiển thị checkbox nếu có quyền xóa
+                    if(user.role.permissions.includes("articles-category_delete"))
+                      td.text-center.align-middle
+                        input.form-check-input(type="checkbox" value=item._id name="ids")
+                    td.text-center.align-middle #{index + 1}
+                    td.text-center.align-middle
+                      if item.thumbnail
+                        img(
+                          src=item.thumbnail
+                          alt=item.title
+                          width="50"
+                          height="50"
+                          style="object-fit:cover;border-radius:8px;border:1px solid #eee;"
+                        )
+                      else
+                        span.text-muted Không có ảnh
+                    td.align-middle #{item.title}
+                    td.align-middle
+                      // Chỉ cho phép thay đổi vị trí nếu có quyền chỉnh sửa
+                      if(user.role.permissions.includes("articles-category_edit"))
+                        input.form-control.form-control-sm.d-inline-block(
+                          type="number"
+                          value=item.position
+                          style="width:60px"
+                          min="1"
+                          name=`positions[${item._id}]`
+                          form="form-change-position"
+                        )
+                      else
+                        span #{item.position}
+                    td.text-center.align-middle
+                      // Chỉ cho phép thay đổi trạng thái nếu có quyền chỉnh sửa
+                      if(user.role.permissions.includes("articles-category_edit"))
+                        button.badge(
+                          type="button"
+                          data-status=item.status
+                          data-id=item._id
+                          button-change-status
+                          class=(item.status == "active" ? "bg-success text-white" : "bg-danger text-white")
+                          style="cursor:pointer;min-width:90px"
+                        )
+                          = item.status == "active" ? "Hoạt động" : "Dừng hoạt động"
+                      else
+                        span.badge(
+                          class=(item.status == "active" ? "bg-success text-white" : "bg-danger text-white")
+                          style="min-width:90px"
+                        )
+                          = item.status == "active" ? "Hoạt động" : "Dừng hoạt động"
+                    td.align-middle
+                      p #{item.accountfullName}
+                      if item.createdBy && item.createdBy.createdAt
+                        p.text-muted.text-sm
+                          +formatDateTime(item.createdBy.createdAt)
+                    td.text-center.align-middle
+                      // Kiểm tra quyền chỉnh sửa
+                      if(user.role.permissions.includes("articles-category_edit"))
+                        a.btn.btn-warning.btn-sm.me-1(
+                          href=`${prefixAdmin}/article-category/edit/${item._id}`
+                        )
+                          i.fas.fa-edit.me-1
+                          | Sửa
+                      
+                      // Kiểm tra quyền xem chi tiết (thường đi kèm với quyền xem)
+                      if(user.role.permissions.includes("articles-category_view"))
+                        a.btn.btn-secondary.btn-sm.me-1(
+                          href=`${prefixAdmin}/article-category/detail/${item._id}`
+                        )
+                          i.fas.fa-eye.me-1
+                          | Chi tiết
+                      
+                      // Kiểm tra quyền xóa
+                      if(user.role.permissions.includes("articles-category_delete"))
+                        button.btn.btn-danger.btn-sm.ms-1(
+                          type="button"
+                          button-delete=""
+                          data-id=item._id
+                        )
+                          i.fas.fa-trash.me-1
+                          | Xóa
 
-                  
-                  td.text-center.align-middle
-                  
-                      a.btn.btn-warning.btn-sm.me-1(
-                        href=`${prefixAdmin}/article-category/edit/${item._id}`
-                      )
-                        i.fas.fa-edit.me-1
-                        | Sửa
-                      a.btn.btn-secondary.btn-sm.me-1(
-                        href=`${prefixAdmin}/article-category/detail/${item._id}`
-                      )
-                        i.fas.fa-eye.me-1
-                        | Chi tiết
-   
-                      button.btn.btn-danger.btn-sm.ms-1(
-                        type="button"
-                        button-delete
-                        data-id=item._id
-                      )
-                        i.fas.fa-trash.me-1
-                        | Xóa
+    .d-flex.justify-content-end.p-3.bg-light
+      // Có thể thêm pagination hoặc các controls khác ở đây
 
-  .d-flex.justify-content-end.p-3.bg-light
+    // Form thay đổi trạng thái - chỉ hiển thị nếu có quyền chỉnh sửa
+    if(user.role.permissions.includes("articles-category_edit"))
+      form#form-change-status(
+        action=""
+        method="POST"
+        data-path=`${prefixAdmin}/article-category/change-status`
+        style="display:none"
+      )
 
-  form#form-change-status(
-    action=""
-    method="POST"
-    data-path=`${prefixAdmin}/article-category/change-status`
-    style="display:none"
-  )
+    // Form xóa item - chỉ hiển thị nếu có quyền xóa
+    if(user.role.permissions.includes("articles-category_delete"))
+      form#form-delete-item(
+        action=""
+        data-path=`${prefixAdmin}/article-category/delete`
+        method="POST"
+        style="display:none"
+      )
 
-  form(
-    action=""
-    data-path=`${prefixAdmin}/article-category/delete`
-    method="POST"
-    id="form-delete-item"
-  )
+    // Form thay đổi vị trí - chỉ hiển thị nếu có quyền chỉnh sửa
+    if(user.role.permissions.includes("articles-category_edit"))
+      form#form-change-position(
+        action=`${prefixAdmin}/article-category/change-position`
+        method="POST"
+        style="display:none"
+      )
 
-  script(src="/admin/js/product.js")
+    script(src="/admin/js/product.js")
+  else
+    // Hiển thị thông báo không có quyền truy cập
+    .alert.alert-warning.text-center
+      i.fas.fa-exclamation-triangle.me-2
+      | Bạn không có quyền truy cập vào trang này.

@@ -34,72 +34,42 @@ const ProductCategory = require("../../models/product-category.model");
 module.exports.index = async (req, res) => {
   try {
     const find = { deleted: false };
-
-    const recods = await ArticleCategory.find(find)
-      .sort({ position: 1 })
-      .lean();
-
-    // Lấy danh sách tất cả product categories để map
-    const productCategories = await ProductCategory.find({ deleted: false }).lean();
-    const productMap = {};
-    productCategories.forEach((cat) => {
-      productMap[String(cat._id)] = cat.title;
-    });
-
-    for (const recod of recods) {
-      // Xử lý người tạo
-      if (recod.createdBy && recod.createdBy.account_id) {
-        const user = await Account.findOne({ _id: recod.createdBy.account_id }).lean();
-        recod.accountfullName = user?.fullName || "Không rõ";
-      } else {
-        recod.accountfullName = "Không rõ";
-      }
-
-      // Gắn tên product category nếu có
-      if (recod.product_category_id) {
-        recod.productCategoryName = productMap[String(recod.product_category_id)] || "Không rõ";
-      } else {
-        recod.productCategoryName = "Không rõ";
+    const recods = await ArticleCategory.find(find).lean();
+    for (const article of recods) {
+      if (article.createdBy && article.createdBy.account_id) {
+        const user = await Account.findOne({
+          _id: article.createdBy.account_id,
+        }).lean();
+        if (user) {
+          article.accountfullName = user.fullName;
+        }
       }
     }
-
-    const treeData = createTree(recods);
-
     res.render("admin/pages/article-category/index", {
       pageTitle: "Danh mục bài viết",
-      recods,
-      treeData,
-      user: res.locals.user || null,
-      prefixAdmin: systemConfig.prefixAdmin,
+      recods: recods,
     });
   } catch (error) {
-    console.error("Error in index:", error);
+    console.error("Error in index:", error)
     res.redirect(`${systemConfig.prefixAdmin}/article-category`);
   }
-};
-
+}
 
 // [GET] /admin/article-category/create
 module.exports.create = async (req, res) => {
   try {
-    // Lấy tất cả danh mục bài viết (đã phân cấp)
-    const allRecords = await ArticleCategory.find({ deleted: false }).lean();
+    const find = {deleted: false};
+    const allRecords = await ArticleCategory.find(find).lean();
     const records = createTree(allRecords);
-
-    // ✅ Lấy thêm danh mục sản phẩm
-    const productCategories = await ProductCategory.find({ deleted: false }).lean();
-
-    // ✅ Truyền cả hai vào view
     res.render("admin/pages/article-category/create", {
       pageTitle: "Tạo danh mục bài viết",
-      records: records,                     // dùng cho select-tree
-      productCategories: productCategories, // dùng cho dropdown sản phẩm
+      records: records,
     });
   } catch (error) {
     console.error("Error in create:", error);
     res.redirect(`${systemConfig.prefixAdmin}/article-category`);
   }
-};
+}
 //[POST] admin/article-category/create
 module.exports.updatePost = async (req, res) => {
   try {
