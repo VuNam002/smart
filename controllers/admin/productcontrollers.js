@@ -9,22 +9,14 @@ const Account = require("../../models/account.model");
 // [GET] /admin/product
 module.exports.index = async (req, res) => {
   const filterStatus = filterStatusHelpers(req.query);
-
   let find = { deleted: false };
-
-  // ✅ DEBUG: Log query parameters
-  console.log("Query params:", req.query);
-  console.log("product_category_id from query:", req.query.product_category_id);
-
   if (req.query.product_category_id) {
-    // ✅ FIXED: Đảm bảo convert đúng ObjectId
     const mongoose = require("mongoose");
     if (mongoose.Types.ObjectId.isValid(req.query.product_category_id)) {
-      find.product_category_id = req.query.product_category_id; // Không cần new mongoose.Types.ObjectId
+      find.product_category_id = req.query.product_category_id; 
       console.log("Category ID filter:", find.product_category_id);
     } else {
       console.log("Invalid ObjectId format:", req.query.product_category_id);
-      // Không filter nếu ObjectId không hợp lệ
     }
   }
 
@@ -36,9 +28,6 @@ module.exports.index = async (req, res) => {
   if (objectSearch.regex) {
     find.title = objectSearch.regex;
   }
-
-  // ✅ DEBUG: Log find object
-  console.log("Find object:", find);
 
   // Pagination
   const countProducts = await Product.countDocuments(find);
@@ -190,21 +179,16 @@ module.exports.create = async (req, res) => {
 
 // [POST] /admin/products/create
 module.exports.createPost = async (req, res) => {
-  // Kiểm tra tiêu đề không được để trống và phải 2 ký tự
   if (!req.body.title || req.body.title.trim().length < 2) {
     req.flash("error", "Tiêu đề không được để trống ");
     const backURL = req.header("Referer") || "/admin/products";
     return res.redirect(backURL);
   }
-
-  // ✅ FIXED: Vì product_category_id là required, phải có giá trị
   if (!req.body.product_category_id || req.body.product_category_id === "") {
     req.flash("error", "Vui lòng chọn danh mục sản phẩm!");
     const backURL = req.header("Referer") || "/admin/products";
     return res.redirect(backURL);
   }
-
-  // ✅ FIXED: Không cần convert to ObjectId, MongoDB sẽ tự động convert
   const mongoose = require("mongoose");
   if (!mongoose.Types.ObjectId.isValid(req.body.product_category_id)) {
     req.flash("error", "Danh mục không hợp lệ!");
@@ -223,8 +207,6 @@ module.exports.createPost = async (req, res) => {
   } else {
     req.body.position = parseInt(req.body.position) || 1;
   }
-
-  // Nếu có file upload thì lấy đường dẫn file từ Cloudinary
   if (req.file && req.file.cloudinaryUrl) {
     req.body.thumbnail = req.file.cloudinaryUrl;
   }
@@ -261,7 +243,6 @@ module.exports.edit = async (req, res) => {
     const product = await Product.findOne(find)
       .populate("product_category_id")
       .lean();
-
     if (!product) {
       req.flash("error", "Không tìm thấy sản phẩm!");
       return res.redirect(`${systemConfig.prefixAdmin}/products`);
@@ -341,23 +322,17 @@ module.exports.updatePost = async (req, res) => {
       stock: parseInt(req.body.stock) || 0,
       position: parseInt(req.body.position) || 1,
       status: req.body.status || "active",
-      featured: req.body.featured || "0", // ✅ THÊM DÒNG NÀY
+      featured: req.body.featured || "0", 
       product_category_id: req.body.product_category_id,
     };
-
-    // ✅ FIXED: Validate ObjectId
     const mongoose = require("mongoose");
     if (!mongoose.Types.ObjectId.isValid(req.body.product_category_id)) {
       req.flash("error", "Danh mục không hợp lệ!");
       return res.redirect(`${systemConfig.prefixAdmin}/products/edit/${id}`);
     }
-
-    // Nếu có file upload mới thì cập nhật thumbnail
     if (req.file && req.file.cloudinaryUrl) {
       updateData.thumbnail = req.file.cloudinaryUrl;
     }
-
-    // Cập nhật sản phẩm
     const result = await Product.updateOne(
       { _id: id, deleted: false },
       { $set: updateData },

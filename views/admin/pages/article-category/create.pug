@@ -23,12 +23,15 @@ block main
         )
 
       .form-group
-        label(for="product_category_id") Danh mục bài viết liên kết
-        select.form-control(name="product_category_id" id="product_category_id")
-          option(value="") --Chọn danh mục sản phẩm--
-          if productCategories && productCategories.length
-            each cat in productCategories
-              option(value=cat._id)= cat.title
+        label(for="product_category_id") Danh mục cha
+        select(
+          name="parent_id"
+          id="parent_id"
+          class="form-control"
+        )
+          option(value="") --Chọn danh mục cha--
+          if(records && records.length > 0)
+            +select-tree(records)
 
 
       .form-group

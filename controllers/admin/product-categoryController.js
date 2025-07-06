@@ -94,7 +94,6 @@ module.exports.updatePost = async (req, res) => {
 };
 
 // GET /admin/product-category/edit/:id
-// Tìm tất cả con cháu theo parent_id
 function findAllChildrenIds(records, parentId) {
   let ids = [];
   for (const item of records) {
@@ -148,8 +147,6 @@ module.exports.edit = async (req, res) => {
 module.exports.deleteItem = async (req, res) => {
   try {
     const id = req.params.id;
-    
-    // Kiểm tra xem danh muc có tồn tại không
     const category = await ProductCategory.findOne({
       _id: id,
       deleted: false
@@ -159,8 +156,6 @@ module.exports.deleteItem = async (req, res) => {
       req.flash("error", "Không tìm thấy danh mục cần xóa!");
       return res.redirect(`${systemConfig.prefixAdmin}/product-category`);
     }
-
-    // Kiểm tra xem danh mục có danh mục con không
     const hasChildren = await ProductCategory.countDocuments({
       parent_id: id,
       deleted: false
@@ -170,8 +165,6 @@ module.exports.deleteItem = async (req, res) => {
       req.flash("error", "Không thể xóa danh mục này vì còn danh mục con!");
       return res.redirect(`${systemConfig.prefixAdmin}/product-category`);
     }
-
-    // Thực hiện xóa (có thể là soft delete hoặc hard delete)
     await ProductCategory.deleteOne({ _id: id });
     
     req.flash("success", "Xóa danh mục thành công!");

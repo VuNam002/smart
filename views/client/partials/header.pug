@@ -1,5 +1,4 @@
 include ../mixins/sub-menu.pug
-
 header.header
   .container
     .row.align-items-center
@@ -16,3 +15,9 @@ header.header
               - const pathProduct = "/products"
               a(href=pathProduct) Sản phẩm
               +sub-menu(layoutProductsCategory, pathProduct)
+            li(class="sub-menu")
+              - const pathBlog = "/blog"
+              a(href=pathBlog) Bài viết
+              +sub-menu(layoutBlogCategories, pathBlog)
+            li
+              a(href="/contact") Liên hệ

@@ -7,7 +7,7 @@ function createTree(arr, parentId = "") {
   const tree = [];
   arr.forEach((item) => {
     if (String(item.parent_id || "") === String(parentId)) {
-      const newItem = { ...item._doc }; // lấy dữ liệu gốc trong Mongoose document
+      const newItem = { ...item._doc || item }; // lấy dữ liệu gốc trong Mongoose document
       const children = createTree(arr, item._id);
       if (children.length > 0) {
         newItem.children = children;
@@ -29,8 +29,6 @@ async function handlePosition(reqBody) {
 }
 
 // [GET] /admin/article-category/index
-const ProductCategory = require("../../models/product-category.model");
-
 module.exports.index = async (req, res) => {
   try {
     const find = { deleted: false };
@@ -50,7 +48,7 @@ module.exports.index = async (req, res) => {
       recods: recods,
     });
   } catch (error) {
-    console.error("Error in index:", error)
+    console.error("Error in index:", error);
     res.redirect(`${systemConfig.prefixAdmin}/article-category`);
   }
 }
@@ -70,10 +68,21 @@ module.exports.create = async (req, res) => {
     res.redirect(`${systemConfig.prefixAdmin}/article-category`);
   }
 }
+
 //[POST] admin/article-category/create
 module.exports.updatePost = async (req, res) => {
   try {
     await handlePosition(req.body);
+    
+    // Xử lý trường parent_id rỗng
+    if (req.body.parent_id === "" || req.body.parent_id === undefined) {
+      delete req.body.parent_id;
+    }
+    
+    req.body.createBy = {
+      account_id: res.locals.user._id,
+      createAt: new Date(),
+    }
 
     const record = new ArticleCategory(req.body);
     await record.save();
@@ -85,6 +94,7 @@ module.exports.updatePost = async (req, res) => {
     res.redirect(`${systemConfig.prefixAdmin}/article-category/create`);
   }
 };
+
 //[PATCH] /admin/article-categoryRoute/change-status/:status/:id
 module.exports.changeStatus = async (req, res) => {
   const status = req.params.status;
@@ -93,6 +103,7 @@ module.exports.changeStatus = async (req, res) => {
   const backURL = req.header("Referer") || "/admin/article-category";
   res.redirect(backURL);
 }
+
 //[GET] /admin/article-category/detail/:id
 module.exports.detail = async (req, res) => {
   try {
@@ -115,6 +126,7 @@ module.exports.detail = async (req, res) => {
     res.redirect(`${systemConfig.prefixAdmin}/article-category`);
   }
 };
+
 //[DELETE] /admin/article/delete/:id
 module.exports.deleteItem = async (req, res) => {
   try {
@@ -151,7 +163,7 @@ module.exports.deleteItem = async (req, res) => {
   }
 };
 
-//[PATCH] admin/article/edit/:id
+//[GET] admin/article-category/edit/:id
 module.exports.edit = async (req, res) => {
   try {
     const id = req.params.id;
@@ -161,7 +173,7 @@ module.exports.edit = async (req, res) => {
     });
     if(!data) {
       req.flash("error", "Không tìm thấy danh mục!");
-      return res.redirect(`${systemConfig.prefixAdmin}/article-category}`)
+      return res.redirect(`${systemConfig.prefixAdmin}/article-category`);
     }
     const allRecords = await ArticleCategory.find({
       deleted: false,
@@ -173,23 +185,30 @@ module.exports.edit = async (req, res) => {
       data,
       records,
     });
-  } catch {
+  } catch (error) {
     console.error("Error in edit: ", error);
     req.flash("error", "Có lỗi xảy ra!");
     res.redirect(`${systemConfig.prefixAdmin}/article-category`);
   }
 }
+
 //[PATCH] admin/article/editPatch/:id
 module.exports.editPatch = async (req, res) => {
   try {
     const id = req.params.id;
     await handlePosition(req.body);
+    
+    // Xử lý trường parent_id rỗng
+    if (req.body.parent_id === "" || req.body.parent_id === undefined) {
+      delete req.body.parent_id;
+    }
+    
     await ArticleCategory.updateOne({ _id: id }, req.body);
     req.flash("success", "Cập nhật danh mục thành công!");  
     res.redirect(`${systemConfig.prefixAdmin}/article-category`);
-    } catch (error) {
-      console.error("Error in editPatch:", error);
-      req.flash("error", "Có lỗi xảy ra khi cập nhật!");
-      res.redirect(`${systemConfig.prefixAdmin}/article-category`);
+  } catch (error) {
+    console.error("Error in editPatch:", error);
+    req.flash("error", "Có lỗi xảy ra khi cập nhật!");
+    res.redirect(`${systemConfig.prefixAdmin}/article-category`);
   }
 }

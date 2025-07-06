@@ -9,11 +9,6 @@ const articleCategorySchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    product_category_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "ProductCategory",
-      default: null,
-    },
     description: String,
     status: String, // quan tâm
     position: Number,
