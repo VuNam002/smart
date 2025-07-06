@@ -12,6 +12,22 @@ module.exports.index = async (req, res) => {
 
   let find = { deleted: false };
 
+  // ✅ DEBUG: Log query parameters
+  console.log("Query params:", req.query);
+  console.log("product_category_id from query:", req.query.product_category_id);
+
+  if (req.query.product_category_id) {
+    // ✅ FIXED: Đảm bảo convert đúng ObjectId
+    const mongoose = require("mongoose");
+    if (mongoose.Types.ObjectId.isValid(req.query.product_category_id)) {
+      find.product_category_id = req.query.product_category_id; // Không cần new mongoose.Types.ObjectId
+      console.log("Category ID filter:", find.product_category_id);
+    } else {
+      console.log("Invalid ObjectId format:", req.query.product_category_id);
+      // Không filter nếu ObjectId không hợp lệ
+    }
+  }
+
   if (req.query.status) {
     find.status = req.query.status;
   }
@@ -21,8 +37,13 @@ module.exports.index = async (req, res) => {
     find.title = objectSearch.regex;
   }
 
+  // ✅ DEBUG: Log find object
+  console.log("Find object:", find);
+
   // Pagination
   const countProducts = await Product.countDocuments(find);
+  console.log("Count products found:", countProducts);
+
   let objectPagination = paginationHelpers(
     {
       currentPage: 1,
@@ -33,27 +54,43 @@ module.exports.index = async (req, res) => {
   );
 
   // Sort
-  let sort = { position: -1 }; // mặc định: vị trí giảm dần
+  let sort = { position: -1 };
 
   if (req.query.sortKey && req.query.sortValue) {
     const value = req.query.sortValue === "asc" ? 1 : -1;
     sort = { [req.query.sortKey]: value };
   }
 
-  // Lấy sản phẩm theo trang
+  // ✅ FIXED: Populate để lấy thông tin category
   const products = await Product.find(find)
+    .populate("product_category_id", "title") // Populate category info
     .sort(sort)
     .skip(objectPagination.skip)
     .limit(objectPagination.limitItems);
 
-  for (const product of products) {
-    const user = await Account.findOne({
-      _id: product.createdBy.account_id,
+  console.log("Products found:", products.length);
+  if (products.length > 0) {
+    console.log("Sample product:", {
+      title: products[0].title,
+      category_id: products[0].product_category_id,
+      category_title: products[0].product_category_id?.title,
     });
-    if(user) {
-      product.accountfullName = user.fullName;
+  }
+
+  // ✅ FIXED: Xử lý createdBy an toàn
+  for (const product of products) {
+    if (product.createdBy && product.createdBy.account_id) {
+      const user = await Account.findOne({
+        _id: product.createdBy.account_id,
+      });
+      if (user) {
+        product.accountfullName = user.fullName;
+      }
     }
   }
+
+  // ✅ FIXED: Lấy danh sách categories để hiển thị trong filter
+  const categories = await Category.find({ deleted: false });
 
   res.render("admin/pages/products/index", {
     pageTitle: "Trang sản phẩm",
@@ -61,6 +98,7 @@ module.exports.index = async (req, res) => {
     filterStatus: filterStatus,
     keyword: objectSearch.keyword,
     pagination: objectPagination,
+    categories: categories, // Thêm categories để hiển thị trong filter
   });
 };
 
@@ -102,34 +140,25 @@ module.exports.changeNulti = async (req, res) => {
 module.exports.deleteItem = async (req, res) => {
   const id = req.params.id;
 
-  await Product.updateOne({_id: id}, {
-    deleted: true,
-    // deleteAt: new Date()
-    deletedBy: {
-      account_id: res.locals.user._id,
-      deletedAt: new Date()
-    }
-  });
+  await Product.updateOne(
+    { _id: id },
+    {
+      deleted: true,
+      deletedBy: {
+        account_id: res.locals.user._id,
+        deletedAt: new Date(),
+      },
+    },
+  );
 
   const backURL = req.header("Referer") || "/admin/products";
   res.redirect(backURL);
 };
 
-// [DELETE] /admin/products/delete/:id  đây là xóa cứng
-// module.exports.deleteItem = async (req, res) => {
-//   const id = req.params.id;
-
-//   // XÓA CỨNG: Xóa luôn khỏi database
-//   await Product.deleteOne({ _id: id });
-
-//   const backURL = req.header("Referer") || "/admin/products";
-//   res.redirect(backURL);
-// };
-
 // [PATCH] /admin/products/change-position
 module.exports.changePosition = async (req, res) => {
   try {
-    const positions = req.body.positions; // {id1: pos1, id2: pos2, ...}
+    const positions = req.body.positions;
     if (!positions) {
       const backURL = req.header("Referer") || "/admin/products";
       return res.redirect(backURL);
@@ -168,6 +197,21 @@ module.exports.createPost = async (req, res) => {
     return res.redirect(backURL);
   }
 
+  // ✅ FIXED: Vì product_category_id là required, phải có giá trị
+  if (!req.body.product_category_id || req.body.product_category_id === "") {
+    req.flash("error", "Vui lòng chọn danh mục sản phẩm!");
+    const backURL = req.header("Referer") || "/admin/products";
+    return res.redirect(backURL);
+  }
+
+  // ✅ FIXED: Không cần convert to ObjectId, MongoDB sẽ tự động convert
+  const mongoose = require("mongoose");
+  if (!mongoose.Types.ObjectId.isValid(req.body.product_category_id)) {
+    req.flash("error", "Danh mục không hợp lệ!");
+    const backURL = req.header("Referer") || "/admin/products";
+    return res.redirect(backURL);
+  }
+
   req.body.price = parseInt(req.body.price) || 0;
   req.body.discountPercentage = parseInt(req.body.discountPercentage) || 0;
   req.body.stock = parseInt(req.body.stock) || 0;
@@ -193,6 +237,9 @@ module.exports.createPost = async (req, res) => {
   try {
     const product = new Product(req.body);
     await product.save();
+
+    console.log("Saved product category_id:", product.product_category_id);
+
     req.flash("success", "Thêm sản phẩm thành công!");
     res.redirect(`${systemConfig.prefixAdmin}/products`);
   } catch (err) {
@@ -210,19 +257,32 @@ module.exports.edit = async (req, res) => {
       deleted: false,
       _id: req.params.id,
     };
-    const product = await Product.findOne(find);
+
+    const product = await Product.findOne(find)
+      .populate("product_category_id")
+      .lean();
 
     if (!product) {
       req.flash("error", "Không tìm thấy sản phẩm!");
       return res.redirect(`${systemConfig.prefixAdmin}/products`);
     }
+    if (
+      product.product_category_id &&
+      typeof product.product_category_id === "object"
+    ) {
+      product.product_category_id = product.product_category_id._id.toString();
+    }
+
+    product.featured = product.featured ? "1" : "0";
+    const records = await Category.find({ deleted: false }).lean();
     res.render("admin/pages/products/edit", {
       pageTitle: "Chỉnh sửa sản phẩm",
-      product: product,
+      product,
+      records,
     });
   } catch (err) {
     console.log("Error finding product:", err);
-    req.flash("error", "Không tìm thấy sản phẩm!");
+    req.flash("error", "Có lỗi xảy ra, vui lòng thử lại sau!");
     res.redirect(`${systemConfig.prefixAdmin}/products`);
   }
 };
@@ -234,7 +294,7 @@ module.exports.detail = async (req, res) => {
       deleted: false,
       _id: req.params.id,
     };
-    const product = await Product.findOne(find);
+    const product = await Product.findOne(find).populate("product_category_id");
 
     if (!product) {
       req.flash("error", "Không tìm thấy sản phẩm!");
@@ -266,6 +326,12 @@ module.exports.updatePost = async (req, res) => {
       return res.redirect(`${systemConfig.prefixAdmin}/products/edit/${id}`);
     }
 
+    // ✅ FIXED: Validate category
+    if (!req.body.product_category_id || req.body.product_category_id === "") {
+      req.flash("error", "Vui lòng chọn danh mục sản phẩm!");
+      return res.redirect(`${systemConfig.prefixAdmin}/products/edit/${id}`);
+    }
+
     // Chuyển đổi kiểu dữ liệu
     const updateData = {
       title: req.body.title.trim(),
@@ -275,7 +341,16 @@ module.exports.updatePost = async (req, res) => {
       stock: parseInt(req.body.stock) || 0,
       position: parseInt(req.body.position) || 1,
       status: req.body.status || "active",
+      featured: req.body.featured || "0", // ✅ THÊM DÒNG NÀY
+      product_category_id: req.body.product_category_id,
     };
+
+    // ✅ FIXED: Validate ObjectId
+    const mongoose = require("mongoose");
+    if (!mongoose.Types.ObjectId.isValid(req.body.product_category_id)) {
+      req.flash("error", "Danh mục không hợp lệ!");
+      return res.redirect(`${systemConfig.prefixAdmin}/products/edit/${id}`);
+    }
 
     // Nếu có file upload mới thì cập nhật thumbnail
     if (req.file && req.file.cloudinaryUrl) {

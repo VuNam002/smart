@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const upload = multer({ storage: multer.memoryStorage() });
 
+
 const controller = require("../../controllers/admin/productcontrollers");
 const validate = require("../../validates/admin/product.validates");
 const uploadToCloudinary = require("../../helpers/uploadCloudinary");

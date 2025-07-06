@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const slug = require("mongoose-slug-updater");
-const { create } = require("./productmodel");
+
 mongoose.plugin(slug);
 
 const productCategorySchema = new mongoose.Schema({
@@ -10,7 +10,8 @@ const productCategorySchema = new mongoose.Schema({
     default: "",
   },
   description: String,
-  status: String,//quan tâm
+  status: String, // quan tâm
+  featured:String,
   position: Number,
   slug: {
     type: String,
@@ -27,15 +28,15 @@ const productCategorySchema = new mongoose.Schema({
   deleted: {
     type: Boolean,
     default: false
-  },//quan tâm đã xóa hay chưa
-  thumbnail:String,
-  deleteAt: Date, //thời gian xóa
+  }, 
+  thumbnail: String,
+  deleteAt: Date, 
   deletedBy: {
     account_id: String,
     deletedAt: Date
   }
-},{
-  timeseries: true
+}, {
+  timestamps: true 
 });
 
 const ProductCategory = mongoose.model("ProductCategory", productCategorySchema, "products-category");

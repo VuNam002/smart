@@ -27,6 +27,27 @@ block main
           +select-tree(records)
         else
           option(disabled) Không có danh mục nào
+    div(class="form-group form-check form-check-inline")
+      input(
+        type="radio"
+        class="form-check-input"
+        id="featuredl"
+        name="deatured"
+        value="1"
+      )
+      lable(for="featuredl" class="form-check-lable") Nổi bật 
+    div(class="form-group form-check form-check-inline")
+      input(
+        type="radio"
+        class="form-check-input"
+        id="featuredl"
+        name="deatured"
+        value="1"
+        checked
+      )
+      lable(for="featuredl" class="form-check-lable") Không nổi bật
+
+
 
     // Mô tả
     .form-group

@@ -1,9 +1,6 @@
-mixin select-tree(records, level = 1, parent_id = "")
-    each item in records
-        - const prefix = Array(level).join('-- ')
-        option(
-            value=item._id
-            selected=(String(item._id) === String(parent_id))
-        ) #{prefix}#{item.title}
-        if item.children && item.children.length > 0
-            +select-tree(item.children, level + 1, parent_id)
+mixin select-tree(categories, level = 0)
+  each category in categories
+    - const prefix = '--'.repeat(level);
+    option(value=category._id)= `${prefix} ${category.title}`
+    if category.children && category.children.length > 0
+      +select-tree(category.children, level + 1)

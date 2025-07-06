@@ -10,12 +10,20 @@ const productSchema = new mongoose.Schema(
       ref: "ProductCategory",
       required: true,
     },
-
     description: String,
     price: Number,
     discountPercentage: Number,
     stock: Number,
-    status: String, //quan tâm
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
+    featured: {
+      type: String, // Có thể dùng enum: ["0", "1"]
+      enum: ["0", "1"],
+      default: "0",
+    },
     position: Number,
     slug: {
       type: String,
@@ -26,22 +34,22 @@ const productSchema = new mongoose.Schema(
       account_id: String,
       createdAt: {
         type: Date,
-        default: Date.now, //lấy ra thời gian hiện t
+        default: Date.now,
       },
     },
     deleted: {
       type: Boolean,
       default: false,
-    }, //quan tâm đã xóa hay chưa
+    },
     thumbnail: String,
-    deleteAt: Date, //thời gian xóa
+    deleteAt: Date,
     deletedBy: {
       account_id: String,
-      deletedAt: Date
-    }
+      deletedAt: Date,
+    },
   },
   {
-    timeseries: true,
+    timestamps: true, // Thay vì timeseries
   },
 );
 
