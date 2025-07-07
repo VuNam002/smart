@@ -11,7 +11,6 @@ module.exports.categoryMiddlewares = async (req, res, next) => {
         .lean();
         const newProductCategory = createTreeHelper.tree(productCategories);
         res.locals.layoutProductsCategory = newProductCategory;
-        console.log("Luôn chạy qua đây");
         next();
     } catch (error) {
         console.error("Error fetching product categories:", error);

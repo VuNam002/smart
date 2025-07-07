@@ -82,3 +82,13 @@ module.exports.treeOptimized = (arr, parentId = "") => {
   
   return tree;
 };
+
+module.exports.convertToMenu = (treeData) => {
+  return treeData.map(item => ({
+    title: item.title,
+    slug: item.slug,
+    children: item.children && item.children.length > 0 
+      ? module.exports.convertToMenu(item.children) 
+      : []
+  }));
+};

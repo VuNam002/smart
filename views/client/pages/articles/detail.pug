@@ -1,0 +1,283 @@
+extends ../../layouts/default.pug
+//- block styles
+//-   link(rel="stylesheet", href="/product-management/public/client/detail.css")
+block main
+  .container.my-4
+    if article
+      // Breadcrumb
+      .row
+        .col-12
+          nav(aria-label="breadcrumb")
+            ol.breadcrumb
+              li.breadcrumb-item
+                a(href="/") Trang chủ
+              li.breadcrumb-item
+                a(href="/articles") Bài viết
+              li.breadcrumb-item.active(aria-current="page") #{article.title}
+      
+      // Article Header
+      .row
+        .col-12
+          .article-header.mb-4
+            h1.article-title.mb-3 #{article.title}
+            .article-meta.text-muted.mb-3
+              .d-flex.flex-wrap.align-items-center.gap-3
+                if article.createdAt
+                  .meta-item
+                    i.fas.fa-calendar-alt.me-1
+                    span #{new Date(article.createdAt).toLocaleDateString('vi-VN')}
+                if article.author
+                  .meta-item
+                    i.fas.fa-user.me-1
+                    span #{article.author}
+                if article.category
+                  .meta-item
+                    i.fas.fa-folder.me-1
+                    span #{article.category}
+            
+            // Article Description
+            if article.description
+              .article-description.mb-4
+                != article.description
+
+      // Main content + Sidebar
+      .row
+        .col-lg-8
+          // Article Content - Phần đầu (trước ảnh)
+          .article-content.mb-4
+            .content-wrapper
+              if article.contentBeforeImage
+                .content-detail
+                  != article.contentBeforeImage
+              else if article.content
+                .content-detail
+                  != article.content
+
+          // Thumbnail - Căn giữa
+          if article.thumbnail
+            .article-thumbnail.mb-4.text-center
+              img.img-fluid.rounded.shadow-sm.article-main-image(
+                src=article.thumbnail,
+                alt=article.title,
+                style="max-width: 100%; height: auto;"
+              )
+              if article.imageCaption
+                .image-caption.mt-2.text-muted.small.fst-italic
+                  | #{article.imageCaption}
+
+          // Article Content - Phần sau (sau ảnh)
+          if article.contentAfterImage
+            .article-content.mb-5
+              .content-wrapper
+                .content-detail
+                  != article.contentAfterImage
+              
+          // Tags Section
+          if article.tags && article.tags.length > 0
+            .article-tags.mb-4
+              h6.mb-2 
+                i.fas.fa-tags.me-1
+                | Tags:
+              .tags-container
+                each tag in article.tags
+                  span.badge.bg-secondary.me-2.mb-2 #{tag}
+
+          // Social Sharing
+          .social-sharing.mb-4
+            h6.mb-2 
+              i.fas.fa-share-alt.me-1
+              | Chia sẻ:
+            .d-flex.gap-2.flex-wrap
+              a.btn.btn-outline-primary.btn-sm(
+                href=`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://yoursite.com/articles/' + article.slug)}`, 
+                target="_blank",
+                rel="noopener noreferrer"
+              )
+                i.fab.fa-facebook-f.me-1
+                | Facebook
+              a.btn.btn-outline-info.btn-sm(
+                href=`https://twitter.com/intent/tweet?url=${encodeURIComponent('https://yoursite.com/articles/' + article.slug)}&text=${encodeURIComponent(article.title)}`, 
+                target="_blank",
+                rel="noopener noreferrer"
+              )
+                i.fab.fa-twitter.me-1
+                | Twitter
+              a.btn.btn-outline-success.btn-sm(
+                href=`https://wa.me/?text=${encodeURIComponent(article.title + ' - https://yoursite.com/articles/' + article.slug)}`, 
+                target="_blank",
+                rel="noopener noreferrer"
+              )
+                i.fab.fa-whatsapp.me-1
+                | WhatsApp
+
+        // Sidebar
+        .col-lg-4
+          .sidebar
+            // Table of Contents
+            if article.tableOfContents && article.tableOfContents.length > 0
+              .toc-widget.card.mb-4.border-0.shadow-sm
+                .card-header.bg-gradient.text-white(style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);")
+                  h6.mb-0
+                    i.fas.fa-list.me-2
+                    | Mục lục
+                .card-body.p-0
+                  ul.list-unstyled.toc-list.mb-0
+                    each item in article.tableOfContents
+                      li.toc-item
+                        a.d-block.text-decoration-none.px-3.py-2.border-bottom.transition-all(
+                          href=`#${item.id}`,
+                          style="transition: all 0.3s ease;"
+                        ) #{item.title}
+
+            // Related Articles
+            if relatedArticles && relatedArticles.length > 0
+              .related-articles.card.mb-4.border-0.shadow-sm
+                .card-header.bg-gradient.text-white(style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);")
+                  h6.mb-0
+                    i.fas.fa-newspaper.me-2
+                    | Bài viết liên quan
+                .card-body
+                  each related in relatedArticles
+                    .related-item.mb-3.pb-3.border-bottom.last-child-no-border
+                      .row.g-2
+                        .col-4
+                          .position-relative.overflow-hidden.rounded
+                            img.img-fluid.transition-transform(
+                              src=related.thumbnail || '/images/default-thumbnail.jpg', 
+                              alt=related.title,
+                              style="height: 80px; object-fit: cover; width: 100%; transition: transform 0.3s ease;"
+                            )
+                        .col-8
+                          h6.mb-1
+                            a.text-decoration-none.text-dark.fw-medium.line-clamp-2(
+                              href=`/articles/${related.slug}`,
+                              style="transition: color 0.3s ease;"
+                            ) #{related.title}
+                          .text-muted.small 
+                            i.fas.fa-calendar.me-1
+                            | #{new Date(related.createdAt).toLocaleDateString('vi-VN')}
+
+            // Newsletter Widget
+            .newsletter-widget.card.mb-4.border-0.shadow-sm
+              .card-header.bg-gradient.text-white(style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);")
+                h6.mb-0
+                  i.fas.fa-envelope.me-2
+                  | Đăng ký nhận tin
+              .card-body
+                p.small.text-muted.mb-3 Nhận thông báo về bài viết mới nhất
+                form#newsletter-form
+                  .mb-3
+                    .position-relative
+                      input.form-control.ps-5(
+                        type="email", 
+                        placeholder="Email của bạn",
+                        required,
+                        style="border-radius: 25px;"
+                      )
+                      i.fas.fa-envelope.position-absolute.text-muted(style="left: 15px; top: 50%; transform: translateY(-50%);")
+                  button.btn.btn-primary.w-100.rounded-pill(type="submit", style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;") 
+                    i.fas.fa-paper-plane.me-2
+                    | Đăng ký ngay
+
+      // Comments Section - Improved Design
+      .row.mt-5
+        .col-12
+          .comments-section.card.border-0.shadow-sm
+            .card-header.bg-danger.border-0.py-4.text-white
+              h4.mb-0.text-center
+                i.fas.fa-comments.me-3
+                | Bình luận
+                span.badge.bg-light.text-danger.ms-2 #{comments.length}
+            
+            .card-body.p-0
+              .comments-container
+                #comments-list.px-4.pt-4
+                  if comments.length > 0
+                    each comment in comments
+                      .comment-item.d-flex.mb-4.pb-4.border-bottom.position-relative
+                        .flex-shrink-0
+                            .avatar-status.position-absolute.bg-success.rounded-circle(
+                              style="width: 12px; height: 12px; bottom: 2px; right: 2px; border: 2px solid white;"
+                            )
+                        .flex-grow-1.ms-3
+                          .comment-header.d-flex.justify-content-between.align-items-start.mb-2
+                            .comment-author
+                              h6.fw-bold.mb-1.text-dark #{comment.fullName}
+                              .text-muted.small.d-flex.align-items-center
+                                i.fas.fa-clock.me-1
+                                | #{new Date(comment.createdAt).toLocaleString('vi-VN')}
+                          .comment-content
+                            p.mb-0.text-muted #{comment.content}
+                  else
+                    .empty-comments.text-center.py-5
+                      .mb-4
+                        i.fas.fa-comments.text-muted(style="font-size: 4rem; opacity: 0.3;")
+                      p.text-muted.mb-0 Chưa có bình luận nào. Hãy là người đầu tiên bình luận!
+                
+                // Comment Form - Enhanced Design
+                .comment-form.bg-light.p-4.mt-4
+                  .text-center.mb-4
+                    h5.mb-2
+                      i.fas.fa-edit.me-2.text-primary
+                      | Để lại bình luận của bạn
+                    p.text-muted.small Chia sẻ suy nghĩ của bạn về bài viết này
+                  
+                  form(
+                    action=`/articles/${article.slug}/comments`
+                    method="POST"
+                  )
+                    .row
+                      .col-md-6.mb-3
+                        .form-floating
+                          input.form-control(
+                            type="text",
+                            placeholder="Nhập họ tên",
+                            name="fullName",
+                            id="fullName",
+                            required
+                          )
+                          label(for="fullName")
+                            i.fas.fa-user.me-1
+                      .col-md-6.mb-3
+                        .form-floating
+                          input.form-control(
+                            type="email",
+                            placeholder="Nhập email",
+                            name="email",
+                            id="email",
+                            required
+                          )
+                          label(for="email")
+                            i.fas.fa-envelope.me-1
+                    .mb-3
+                      .form-floating
+                        textarea.form-control(
+                          rows="4",
+                          placeholder="Nhập nội dung bình luận",
+                          name="content",
+                          id="content",
+                          required,
+                          style="min-height: 120px;"
+                        )
+                        label(for="content")
+                          i.fas.fa-comment.me-1
+                    .text-center
+                      button.btn.btn-primary.btn-lg.rounded-pill.px-5(
+                        type="submit",
+                        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;"
+                      )
+                        i.fas.fa-paper-plane.me-2
+                        | Gửi bình luận
+
+    else
+      // Not found
+      .row
+        .col-12
+          .text-center.py-5
+            .mb-4
+              i.fas.fa-exclamation-triangle.text-warning(style="font-size: 4rem;")
+            h2.mb-3 Bài viết không tồn tại
+            p.text-muted.mb-4 Rất tiếc, bài viết bạn tìm kiếm không tồn tại hoặc đã bị xóa.
+            a.btn.btn-primary(href="/articles") 
+              i.fas.fa-arrow-left.me-1
+              | Về trang bài viết

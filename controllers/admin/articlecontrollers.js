@@ -157,6 +157,8 @@ module.exports.edit = async (req, res) => {
       deleted: false,
     });
 
+    article.featured = article.featured ? "1" : "0";
+
     res.render("admin/pages/articles/edit", {
       pageTitle: "Chỉnh sửa bài viết",
       article: article,

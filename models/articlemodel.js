@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const slug = require("mongoose-slug-updater");
-const { create } = require("./productmodel");
 mongoose.plugin(slug);
 
 const articleSchema = new mongoose.Schema(
@@ -9,10 +8,10 @@ const articleSchema = new mongoose.Schema(
     article_category_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ArticleCategory",
-      required: true,
     },
     description: String,
     content: String,
+    thumbnail: String,
     status: String,
     position: Number,
     slug: {
@@ -31,19 +30,21 @@ const articleSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    thumbnail: String,
-    deleteAt: Date,
+    deletedAt: Date,
     deletedBy: {
       account_id: String,
       deletedAt: Date,
     },
   },
   {
-    timeseries: true,
-  },
+    timestamps: true,
+  }
 );
 
-const Article = mongoose.model("Article", articleSchema, "articles");
+const Article = mongoose.model(
+  "Article",
+  articleSchema,
+  "articles"
+);
 
 module.exports = Article;
-

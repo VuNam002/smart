@@ -1,20 +1,187 @@
-extends ../../layouts/default.pug 
+extends ../../layouts/default.pug
 
-block main 
-    .container.my-3 
-        .row    
-            .col-12 
-                if product
-                    h1= product.title
-                    if product.thumbnail
-                        img(src=product.thumbnail, alt=product.title, style="max-width:220px;")
-                    p.mt-3 Giá: 
-                        strong= product.price ? product.price.toLocaleString() + ' ₫' : '0 ₫'
-                    p.mt-2
-                        .mt-1 !{product.description}
-                    p.mt-2
-                        | Số lượng: #{product.stock}
-                    p.mt-2
-                        | Giảm giá: #{product.discountPercentage}%
+block main
+  .container.my-4
+    .row
+      .col-12
+        if product
+          .row
+            // Product Image
+            .col-md-5.col-lg-4.mb-4
+              .product-image-container.position-relative
+                if product.thumbnail
+                  img.product-main-image.w-100.rounded.shadow-sm(
+                    src=product.thumbnail, 
+                    alt=product.title
+                  )
                 else
-                    .alert.alert-danger Sản phẩm không tồn tại hoặc đã bị xóa!
+                  .no-image.d-flex.align-items-center.justify-content-center.bg-light.rounded
+                    i.fas.fa-image.fa-3x.text-muted
+                
+                // Discount badge
+                if product.discountPercentage > 0
+                  .discount-badge.position-absolute.top-0.start-0.m-2
+                    .badge.bg-danger.px-2.py-1
+                      = '-' + product.discountPercentage + '%'
+            
+            // Product Info
+            .col-md-7.col-lg-8
+              .product-info
+                h1.product-title.mb-3= product.title
+                
+                // Price section
+                .price-section.mb-4.p-3.bg-light.rounded
+                  .row.align-items-center
+                    .col-auto
+                      span.text-muted.small Giá bán:
+                    .col
+                      if product.discountPercentage > 0
+                        .d-flex.align-items-center.gap-2
+                          span.current-price.fw-bold.text-danger.fs-4
+                            = (product.price * (100 - product.discountPercentage) / 100).toLocaleString() + ' ₫'
+                          span.original-price.text-muted.text-decoration-line-through
+                            = product.price ? product.price.toLocaleString() + ' ₫' : '0 ₫'
+                      else
+                        span.current-price.fw-bold.text-dark.fs-4
+                          = product.price ? product.price.toLocaleString() + ' ₫' : '0 ₫'
+                
+                
+                // Description
+                .description-section.mb-4
+                  h5.mb-3 Mô tả sản phẩm
+                  .description-content.p-3.border.rounded.bg-white
+                    != product.description
+                
+                // Action buttons
+                .action-buttons.d-flex.gap-3.mb-4
+                  button.btn.btn-primary.btn-lg.flex-fill(type="button")
+                    i.fas.fa-shopping-cart.me-2
+                    | Thêm vào giỏ hàng
+                  button.btn.btn-outline-secondary.btn-lg(type="button")
+                    i.fas.fa-heart.me-2
+                    | Yêu thích
+                
+                // Additional info
+                .additional-info.row.g-3
+                  .col-md-6
+                    .info-card.p-3.border.rounded.text-center
+                      i.fas.fa-shipping-fast.text-primary.mb-2.fs-4
+                      h6.mb-1 Giao hàng nhanh
+                      small.text-muted Miễn phí vận chuyển
+                  .col-md-6
+                    .info-card.p-3.border.rounded.text-center
+                      i.fas.fa-shield-alt.text-success.mb-2.fs-4
+                      h6.mb-1 Bảo hành chính hãng
+                      small.text-muted 12 tháng bảo hành
+        else
+          .row.justify-content-center
+            .col-md-6.text-center.py-5
+              .alert.alert-danger.p-4
+                i.fas.fa-exclamation-triangle.fa-2x.mb-3
+                h4.mb-3 Sản phẩm không tồn tại
+                p.mb-0 Sản phẩm không tồn tại hoặc đã bị xóa!
+                .mt-3
+                  a.btn.btn-primary(href="/") Quay lại trang chủ
+
+  style.
+    .product-image-container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    
+    .product-main-image {
+      width: 100%;
+      height: auto;
+      max-height: 400px;
+      object-fit: contain;
+      background-color: #f8f9fa;
+    }
+    
+    .no-image {
+      height: 300px;
+      border: 2px dashed #dee2e6;
+    }
+    
+    .discount-badge {
+      z-index: 10;
+    }
+    
+    .product-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #212529;
+      line-height: 1.3;
+    }
+    
+    .price-section {
+      border-left: 4px solid #dc3545;
+    }
+    
+    .current-price {
+      font-size: 1.8rem;
+    }
+    
+    .original-price {
+      font-size: 1.1rem;
+    }
+    
+    .description-content {
+      max-height: 300px;
+      overflow-y: auto;
+      line-height: 1.6;
+    }
+    
+    .action-buttons .btn {
+      padding: 12px 24px;
+      font-weight: 500;
+      border-radius: 8px;
+    }
+    
+    .info-card {
+      transition: transform 0.2s ease;
+    }
+    
+    .info-card:hover {
+      transform: translateY(-2px);
+    }
+    
+    .badge {
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .bg-light {
+      background-color: #f8f9fa !important;
+    }
+    
+    .border {
+      border-color: #dee2e6 !important;
+    }
+    
+    .alert-danger {
+      border-color: #dc3545;
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    @media (max-width: 768px) {
+      .product-title {
+        font-size: 1.3rem;
+      }
+      
+      .current-price {
+        font-size: 1.5rem;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .action-buttons .btn {
+        margin-bottom: 0.5rem;
+      }
+      
+      .additional-info .col-md-6 {
+        margin-bottom: 1rem;
+      }
+    }
