@@ -8,6 +8,7 @@ const articleSchema = new mongoose.Schema(
     article_category_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ArticleCategory",
+      required: true,
     },
     description: String,
     content: String,

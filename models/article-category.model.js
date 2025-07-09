@@ -12,6 +12,7 @@ const articleCategorySchema = new mongoose.Schema(
     description: String,
     status: String, // quan tâm
     position: Number,
+    featured: String,
     slug: {
       type: String,
       slug: "title",

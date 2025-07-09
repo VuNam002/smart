@@ -1,20 +1,16 @@
 const Article = require("../../models/articlemodel");
 const Comment = require("../../models/comment.model");
+const ArticleCategory = require("../../models/article-category.model");
+const articleHelper = require("../../helpers/article.helper");
+const articleCategoryHelper = require("../../helpers/article-category.helper");
 
 // [GET] /articles/
 const index = async (req, res) => {
   try {
     // Thực hiện các truy vấn song song để tăng hiệu suất
     const [articlesFeatured, articlesNew, articles] = await Promise.all([
-      Article.find({
-        featured: "1",
-        deleted: false,
-        status: "active",
-      }).sort({ position: "desc" }).limit(3),
-      Article.find({
-        deleted: false,
-        status: "active",
-      }).sort({ createdAt: "desc" }).limit(3),
+      articleHelper.getFeaturedArticles(3),
+      articleHelper.getNewArticles(3),
       Article.find({
         status: "active",
         deleted: false,
@@ -29,7 +25,7 @@ const index = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.redirect("/");
+    res.redirect("/articles");
   }
 };
 
@@ -45,34 +41,28 @@ const detail = async (req, res) => {
     }).populate("article_category_id");
 
     if (article) {
-      // Lấy ra các bài viết liên quan cùng danh mục
-      const relatedArticles = await Article.find({
-        _id: { $ne: article.id },
-        article_category_id: article.article_category_id,
-        status: "active",
-        deleted: false,
-      })
-        .sort({ position: "desc" })
-        .limit(4);
-
-      // Lấy ra danh sách bình luận
-      const comments = await Comment.find({
-        article_id: article.id,
-        deleted: false,
-      }).sort({ createdAt: "desc" });
-
-      // Lấy ra bài viết nổi bật (for sidebar)
-      const articlesFeatured = await Article.find({
-        featured: "1",
-        deleted: false,
-        status: "active",
-      }).sort({ position: "desc" }).limit(5);
-
-      // Lấy ra bài viết mới nhất (for sidebar)
-      const articlesNew = await Article.find({
-        deleted: false,
-        status: "active",
-      }).sort({ createdAt: "desc" }).limit(5);
+      const [
+        relatedArticles,
+        comments,
+        articlesFeatured,
+        articlesNew
+      ] = await Promise.all([
+        // Lấy ra các bài viết liên quan cùng danh mục
+        Article.find({
+          _id: { $ne: article.id },
+          article_category_id: article.article_category_id,
+          status: "active",
+          deleted: false,
+        }).sort({ position: "desc" }).limit(4),
+        // Lấy ra danh sách bình luận
+        Comment.find({
+          article_id: article.id,
+          deleted: false,
+        }).sort({ createdAt: "desc" }),
+        // Lấy ra bài viết nổi bật và mới nhất cho sidebar
+        articleHelper.getFeaturedArticles(5),
+        articleHelper.getNewArticles(5)
+      ]);
 
       res.render("client/pages/articles/detail", {
         pageTitle: article.title,
@@ -95,10 +85,15 @@ const detail = async (req, res) => {
 const createComment = async (req, res) => {
   try {
     const slug = req.params.slug;
-    const article = await Article.findOne({ slug: slug });
+    const article = await Article.findOne({
+      slug: slug,
+      deleted: false,
+      status: "active"
+    });
 
     if (!article) {
-      return res.redirect("/");
+      // Không tìm thấy bài viết hoặc bài viết không hoạt động
+      return res.redirect("/articles");
     }
 
     const comment = new Comment({
@@ -115,9 +110,44 @@ const createComment = async (req, res) => {
     res.redirect(`/articles/${req.params.slug}`);
   }
 };
+//[GET]/article/:slugCategory
+const category = async (req, res) => {
+  try {
+    const slugCategory = req.params.slugCategory;
+    const category = await ArticleCategory.findOne({
+      slug: slugCategory,
+      deleted: false,
+      status: "active",
+    });
+    if (category) {
+      const listSubCategory = await articleCategoryHelper.getSubCategory(category.id);
+      const listSubCategoryId = listSubCategory.map(item => item.id);
+      const allCategoryIds = [category.id, ...listSubCategoryId];
+
+      // Chỉ lấy các bài viết thuộc danh mục
+      const articles = await Article.find({
+        article_category_id: { $in: allCategoryIds },
+        deleted: false,
+        status: "active",
+      }).sort({ position: "desc" });
+
+      res.render("client/pages/articles/index", {
+        pageTitle: category.title,
+        articles,
+      });
+    } else {
+      res.redirect("/articles");
+    }
+  } catch (error) {
+    console.log("Lỗi ở category:", error);
+    res.redirect("/articles");
+  }
+};
+
 
 module.exports = {
   index,
   detail,
   createComment,
+  category
 };
