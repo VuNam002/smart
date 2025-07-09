@@ -13,6 +13,13 @@ const productSchema = new mongoose.Schema(
     description: String,
     price: Number,
     discountPercentage: Number,
+    rating: {
+      type: Number,
+      default: 0,
+    },
+    ratings: [
+      { star: Number },
+    ],
     stock: Number,
     status: {
       type: String,
@@ -49,7 +56,7 @@ const productSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // Thay vì timeseries
+    timestamps: true, 
   },
 );
 

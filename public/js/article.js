@@ -1,4 +1,4 @@
-// Gửi bình luận
+
 const formComment = document.querySelector("#comment-form");
 if (formComment) {
   formComment.addEventListener("submit", async (e) => {

@@ -5,7 +5,10 @@ const commentSchema = new mongoose.Schema(
     article_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Article",
-      required: true,
+    },
+    product_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
     },
     // user_id: { type: mongoose.Schema.Types.ObjectId, ref: "Account" }, // Sẽ dùng khi có chức năng đăng nhập
     fullName: String,

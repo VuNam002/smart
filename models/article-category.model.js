@@ -36,7 +36,7 @@ const articleCategorySchema = new mongoose.Schema(
     },
   },
   {
-    timeseries: true, // ✅ đặt đúng vị trí
+    timestamps: true,
   },
 );
 

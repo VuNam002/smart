@@ -28,7 +28,7 @@ const detail = async (req, res) => {
       slug: slug,
       status: "active",
       deleted: false,
-    });
+    }).populate("article_category_id");
 
     if (article) {
       // Lấy ra các bài viết liên quan cùng danh mục

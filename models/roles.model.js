@@ -15,7 +15,7 @@ const rolesSchema = new mongoose.Schema(
     deleteAt: Date, //thời gian xóa
   },
   {
-    timeseries: true,
+    timestamps: true,
   },
 );
 

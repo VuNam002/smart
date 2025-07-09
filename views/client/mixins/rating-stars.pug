@@ -1,0 +1,14 @@
+mixin rating-stars(rating)
+  - const fullStars = Math.floor(rating)
+  - const halfStar = (rating - fullStars) >= 0.5 ? 1 : 0
+  - const emptyStars = 5 - fullStars - halfStar
+  .rating-stars.text-warning.small
+    //- Sao đầy
+    - for (let i = 0; i < fullStars; i++)
+      i.fas.fa-star
+    //- Sao nửa
+    - if (halfStar)
+      i.fas.fa-star-half-alt
+    //- Sao rỗng (cần có FontAwesome regular `far`)
+    - for (let i = 0; i < emptyStars; i++)
+      i.far.fa-star

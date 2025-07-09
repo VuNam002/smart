@@ -19,13 +19,11 @@ module.exports = (query) => {
 
   if (query.status) {
     const index = filterStatus.findIndex(
-      //dùng để tìm chỉ số
       (item) => item.status == query.status,
     );
     filterStatus[index].class = "active";
   } else {
     const index = filterStatus.findIndex(
-      //dùng để tìm chỉ số
       (item) => item.status == "",
     );
     filterStatus[index].class = "active";

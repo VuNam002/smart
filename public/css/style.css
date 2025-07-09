@@ -24,7 +24,7 @@
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-color);
-  padding: 1rem 0;
+  padding:  8px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -93,21 +93,22 @@
 
 /* ====== Dropdown Menu ====== */
 .sub-menu > ul {
+  z-index: 100;
   position: absolute;
   top: calc(100% + 0.5rem);
   left: 0;
+  margin-top: -7px;
   background: white;
-  border-radius: var(--radius-lg);
+  left: -50px;
   min-width: 220px;
   box-shadow: var(--shadow-xl);
   border: 1px solid var(--border-color);
   display: none;
   flex-direction: column;
-  z-index: 99;
   opacity: 0;
   transform: translateY(-10px);
   transition: var(--transition);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .sub-menu:hover > ul {
@@ -117,7 +118,7 @@
 }
 
 .sub-menu ul li a {
-  padding: 0.875rem 1.25rem;
+  padding: 0.875rem 4.25rem;
   border-radius: 0;
   color: var(--text-primary);
   font-weight: 400;
@@ -142,18 +143,16 @@
 }
 
 .sub-menu ul li ul {
-  top: 0;
-  left: calc(100% + 0.5rem);
-  position: absolute;
-  display: none;
-  min-width: 220px;
-  background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl);
-  border: 1px solid var(--border-color);
-  opacity: 0;
-  transform: translateX(-10px);
-  transition: var(--transition);
+    left: 203px;
+    top: 5px;
+    position: absolute;
+    display: none;
+    min-width: 220px;
+    background: white;
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--border-color);
+    transform: translateX(-10px);
+    transition: var(--transition);
 }
 
 .sub-menu ul li:hover > ul {
@@ -318,6 +317,7 @@
   .sub-menu > ul,
   .sub-menu ul li ul {
     position: static;
+
     box-shadow: none;
     background: var(--secondary-color);
     display: none;
