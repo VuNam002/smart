@@ -1,15 +1,13 @@
-//code cấu hinh
+const mongoose = require("mongoose");
 
-const mongoose  = require('mongoose');
-
-
-module.exports.connect = async()=> {
-    try {
-        await mongoose.connect(process.env.MONGO_URL);
-        console.log("Connect Success!");
-    }catch(error){
-        console.log("Connect Error!");
-    }
-}
-
-
+module.exports.connect = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("MongoDB connected successfully");
+  } catch (error) {
+    console.error("MongoDB connection error:", error.message);
+  }
+};
