@@ -47,6 +47,29 @@ block main
                             a.btn.btn-outline-success.px-4.py-2.rounded-pill(href="/products/new")
                                 span Xem thêm sản phẩm mới
                                 i.fas.fa-arrow-right.ml-2
+
+        //- Hiển thị sản phẩm theo từng danh mục
+        if categories && categories.length > 0
+            each category, index in categories
+                if category.products && category.products.length > 0
+                    //- Dùng class bg-light để tạo màu nền xen kẽ cho dễ nhìn
+                    - const bgClass = index % 2 === 0 ? '' : 'bg-light'
+                    .section-products-category.py-5(class=bgClass)
+                        .container
+                            .row.mb-4
+                                .col-12
+                                    .section-header.position-relative.mb-4
+                                        //- Tiêu đề danh mục, cũng là link dẫn đến trang danh mục
+                                        h2.section-title.font-weight-bold.text-dark.mb-2
+                                            a(href=`/products/${category.slug}`, class="text-dark text-decoration-none")= category.title
+                                        .title-underline.mb-3
+                            .product-grid.position-relative
+                                .row
+                                    //- Lặp qua và hiển thị các sản phẩm trong danh mục
+                                    each item in category.products
+                                        .col-xl-3.col-lg-4.col-md-6.col-sm-6.col-12
+                                            .product-item.h-100
+                                                +product-card(item)
         .section-features.py-5
             .container
                 .row.mb-4
