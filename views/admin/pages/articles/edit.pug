@@ -25,11 +25,11 @@ block main
         // Mô tả
         .form-group
             label(for="desc") Mô tả
-            textarea.form-control(
+            textarea.form-control.textarea-mce(
                 id="desc",
                 name="description",
                 rows="5"
-            ) #{article.description}
+            ) !#{article.description}
 
         // Danh mục
         .form-group
@@ -45,6 +45,27 @@ block main
                         value=category._id,
                         selected=article.article_category_id && article.article_category_id.toString() === category._id.toString()
                     )= category.title
+
+        .form-group.form-check.form-check-inline
+            input.form-check-input(
+                type="radio"
+                id="featured1"
+                name="featured"
+                value="1"
+                checked=(article.featured == "1")
+            )
+            label.form-check-label(for="featured1") Nổi bật 
+        
+        .form-group.form-check.form-check-inline
+            input.form-check-input(
+                type="radio"
+                id="featured0"
+                name="featured"
+                value="0"
+                checked=(article.featured == "0")
+            )
+            label.form-check-label(for="featured0") Không nổi bật
+
 
         // Ảnh đại diện
         .form-group(upload-image)

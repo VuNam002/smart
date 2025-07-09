@@ -4,13 +4,27 @@ const Comment = require("../../models/comment.model");
 // [GET] /articles/
 const index = async (req, res) => {
   try {
-    const articles = await Article.find({
-      status: "active",
-      deleted: false,
-    }).sort({ position: "desc" });
+    // Thực hiện các truy vấn song song để tăng hiệu suất
+    const [articlesFeatured, articlesNew, articles] = await Promise.all([
+      Article.find({
+        featured: "1",
+        deleted: false,
+        status: "active",
+      }).sort({ position: "desc" }).limit(3),
+      Article.find({
+        deleted: false,
+        status: "active",
+      }).sort({ createdAt: "desc" }).limit(3),
+      Article.find({
+        status: "active",
+        deleted: false,
+      }).sort({ position: "desc" })
+    ]);
 
     res.render("client/pages/articles/index", {
       pageTitle: "Danh sách bài viết",
+      articlesFeatured: articlesFeatured,
+      articlesNew: articlesNew,
       articles: articles,
     });
   } catch (error) {
@@ -47,11 +61,26 @@ const detail = async (req, res) => {
         deleted: false,
       }).sort({ createdAt: "desc" });
 
+      // Lấy ra bài viết nổi bật (for sidebar)
+      const articlesFeatured = await Article.find({
+        featured: "1",
+        deleted: false,
+        status: "active",
+      }).sort({ position: "desc" }).limit(5);
+
+      // Lấy ra bài viết mới nhất (for sidebar)
+      const articlesNew = await Article.find({
+        deleted: false,
+        status: "active",
+      }).sort({ createdAt: "desc" }).limit(5);
+
       res.render("client/pages/articles/detail", {
         pageTitle: article.title,
         article: article,
         relatedArticles: relatedArticles,
         comments: comments,
+        articlesFeatured: articlesFeatured,
+        articlesNew: articlesNew,
       });
     } else {
       res.redirect("/articles");

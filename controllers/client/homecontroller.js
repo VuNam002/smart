@@ -1,5 +1,6 @@
 const Product = require("../../models/productmodel");
 const ProductCategory = require("../../models/product-category.model");
+const Article = require("../../models/articlemodel");
 const productHelper = require("../../helpers/product.helper");
 const categoryHelper = require("../../helpers/category.helper");
 
@@ -41,10 +42,18 @@ module.exports.index = async (req, res) => {
     category.products = productHelper.calcNewPrice(productsInCategory);
   }
 
+  // Lấy ra bài viết nổi bật
+  const articlesFeatured = await Article.find({
+    featured: "1",
+    deleted: false,
+    status: "active",
+  }).sort({ position: "desc" }).limit(6);
+
   res.render("client/pages/home/index", {
     pageTitle: "Trang chủ",
     productsFeatured: newProductsFeatured,
     productsNew: newProductsNew,
     categories: categories,
+    articlesFeatured: articlesFeatured,
   });
 };

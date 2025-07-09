@@ -1,0 +1,12 @@
+mixin article-card(item)
+  .card.h-100.border-0.shadow-sm.article-item.mb-4
+    a(href=`/articles/${item.slug}`)
+      img.card-img-top(src=item.thumbnail, alt=item.title, style="height: 200px; object-fit: cover;")
+    .card-body.d-flex.flex-column
+      h5.card-title
+        a.text-dark.text-decoration-none(href=`/articles/${item.slug}`)= item.title
+      if item.description
+        - const plainDescription = item.description.replace(/<[^>]*>?/gm, '');
+        p.card-text.text-muted.flex-grow-1!= plainDescription.substring(0, 100) + (plainDescription.length > 100 ? "..." : "")
+      .mt-auto
+        a.btn.btn-link.p-0(href=`/articles/${item.slug}`) Đọc thêm &rarr;

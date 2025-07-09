@@ -232,7 +232,7 @@ module.exports.createPost = async (req, res) => {
   }
 };
 
-//[GET] /admin/products/edit/:id - Hiển thị form edit
+//[GET] /admin/products/edit/:id 
 module.exports.edit = async (req, res) => {
   try {
     const find = {

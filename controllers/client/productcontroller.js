@@ -70,28 +70,6 @@ const createComment = async (req, res) => {
   }
 };
 
-const rate = async (req, res) => {
-  const { slug } = req.params;
-  const { star } = req.body;
-  if (!star || star < 1 || star > 5) {
-    return res.redirect(`/products/${slug}`);
-  }
-  try {
-    const product = await Product.findOne({ slug: slug, deleted: false });
-    if (!product) {
-      return res.redirect("/products");
-    }
-    product.ratings.push({ star: parseInt(star, 10) });
-    const totalStars = product.ratings.reduce((sum, item) => sum + item.star, 0);
-    product.rating = (totalStars / product.ratings.length).toFixed(1);
-
-    await product.save();
-    res.redirect(`/products/${slug}`);
-  } catch (error) {
-    console.error("Error processing rating:", error);
-    res.redirect(`/products/${slug}`);
-  }
-};
 //[GET]/products/:slugCategory
 const category = async (req, res) => {
   try {
@@ -128,6 +106,5 @@ module.exports = {
   index,
   detail,
   createComment,
-  rate,
   category,
 };

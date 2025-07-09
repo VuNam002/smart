@@ -19,6 +19,11 @@ const articleSchema = new mongoose.Schema(
       slug: "title",
       unique: true,
     },
+    featured: {
+      type: String,
+      enum: ["0", "1"],
+      default: "0",
+    },
     createdBy: {
       account_id: String,
       createdAt: {

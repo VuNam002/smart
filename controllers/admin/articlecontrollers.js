@@ -162,7 +162,7 @@ module.exports.edit = async (req, res) => {
     res.render("admin/pages/articles/edit", {
       pageTitle: "Chỉnh sửa bài viết",
       article: article,
-      records: records, // ← Quan trọng: truyền danh sách danh mục
+      records: records,
     });
   } catch (err) {
     console.log("Error finding article:", err);
