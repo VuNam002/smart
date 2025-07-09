@@ -7,7 +7,7 @@ module.exports.index = async (req, res) => {
     featured: "1",
     deleted: false,
     status: "active",
-  }).limit(6);//Lấy ra số lượng sản phẩm tối đa
+  }).limit(8);//Lấy ra số lượng sản phẩm tối đa
   const newProductsFeatured = productHelper.calcNewPrice(productsFeatured);
 
   const products = await Product.find({
@@ -20,7 +20,7 @@ module.exports.index = async (req, res) => {
   const productsNew = await Product.find({
     status: "active",
     deleted: false,
-  }).sort({ createdAt: "desc" }).limit(6);
+  }).sort({ createdAt: "desc" }).limit(8);
   const newProductsNew = productHelper.calcNewPrice(productsNew);
 
 

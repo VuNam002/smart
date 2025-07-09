@@ -2,61 +2,82 @@ extends ../../layouts/default.pug
 include ../../mixins/box-head.pug
 include ../../mixins/product-card.pug
 
+block styles
+    link(rel="stylesheet", href="/css/pages/home.css")
+
 block main
-    .home-page
-        // Breadcrumb
-        .container.mt-3
-            nav(aria-label="breadcrumb")
-                ol.breadcrumb.mb-0
-                    li.breadcrumb-item
-                        a.text-decoration-none(href="/") Trang chủ
-        
-        
-        // Featured Products Section
-        .section-products-featured.bg-light.py-4
+    .home-page  
+        .section-products-featured.py-5
             .container
                 .row.mb-4
-                    .col-12
-                        +box-head("Sản phẩm nổi bật")
-                        p.text-muted.small.mb-0 Những sản phẩm được lựa chọn đặc biệt dành cho bạn
-                
-                .row.g-3
-                    each item in productsFeatured
-                        .col-xl-3.col-lg-4.col-md-6.col-sm-6.col-12
-                            +product-card(item)
-        //Sản phẩm mới
-        .section-products-featured.bg-light.py-4
+                    .col-12.text-center
+                        .section-header.position-relative.mb-4
+                            h2.section-title.font-weight-bold.text-dark.mb-2 Sản phẩm nổi bật
+                            .title-underline.title-underline--featured.mx-auto.mb-3
+                            p.text-muted.mb-0 Những sản phẩm được lựa chọn đặc biệt dành cho bạn
+                            
+                .product-grid.position-relative
+                    .row
+                        each item in productsFeatured
+                            .col-xl-3.col-lg-4.col-md-6.col-sm-6.col-12
+                                .product-item.h-30 
+                                    +product-card(item)
+                    .row.mt-4
+                        .col-12.text-center
+                            a.btn.btn-outline-primary.px-4.py-2.rounded-pill(href="/products/featured")
+                                span Xem thêm sản phẩm nổi bật
+                                i.fas.fa-arrow-right.ml-2
+        .section-products-new.bg-light.py-5
             .container
                 .row.mb-4
-                    .col-12
-                        +box-head("Sản phẩm mới")
-                
-                .row.g-3
-                    each item in productsNew
-                        .col-xl-3.col-lg-4.col-md-6.col-sm-6.col-12
-                            +product-card(item)
-        .container.my-5
-            .row.g-4
-                .col-md-4
-                    .card.border-0.text-center.h-100
-                        .card-body.py-4
-                            .text-primary.mb-3
-                                i.fas.fa-shipping-fast.fa-3x
-                            h5.card-title Giao hàng miễn phí
-                            p.card-text.text-muted.small Giao hàng miễn phí toàn quốc cho đơn hàng trên 500.000₫
+                    .col-12.text-center
+                        .section-header.position-relative.mb-4
+                            h2.section-title.font-weight-bold.text-dark.mb-2 Sản phẩm mới
+                            .title-underline.title-underline--new.mx-auto.mb-3
+                            p.text-muted.mb-0 Cập nhật những sản phẩm mới nhất từ các thương hiệu hàng đầu
                             
-                .col-md-4
-                    .card.border-0.text-center.h-100
-                        .card-body.py-4
-                            .text-success.mb-3
-                                i.fas.fa-shield-alt.fa-3x
-                            h5.card-title Bảo hành chính hãng
-                            p.card-text.text-muted.small Bảo hành chính hãng từ 12-24 tháng
-                            
-                .col-md-4
-                    .card.border-0.text-center.h-100
-                        .card-body.py-4
-                            .text-info.mb-3
-                                i.fas.fa-credit-card.fa-3x
-                            h5.card-title Trả góp 0% lãi suất
-                            p.card-text.text-muted.small Hỗ trợ trả góp 0% lãi suất qua thẻ tín dụng
+                .product-grid.position-relative
+                    .row
+                        each item in productsNew
+                            .col-xl-3.col-lg-4.col-md-6.col-sm-6.col-12
+                                .product-item.h-100
+                                    +product-card(item)
+                    .row.mt-4
+                        .col-12.text-center
+                            a.btn.btn-outline-success.px-4.py-2.rounded-pill(href="/products/new")
+                                span Xem thêm sản phẩm mới
+                                i.fas.fa-arrow-right.ml-2
+        .section-features.py-5
+            .container
+                .row.mb-4
+                    .col-12.text-center
+                        h2.font-weight-bold.text-dark.mb-2 Tại sao chọn chúng tôi?
+                        .title-underline.title-underline--why-us.mx-auto.mb-3
+                        
+                .row
+                    .col-md-4
+                        .feature-card.card.border-0.shadow-sm.h-100.text-center.transition-card
+                            .card-body.py-5
+                                .feature-icon.mb-4
+                                    .icon-circle.icon-circle--shipping.mx-auto.d-flex.align-items-center.justify-content-center
+                                        i.fas.fa-shipping-fast.fa-2x.text-white
+                                h5.card-title.font-weight-bold.mb-3 Giao hàng miễn phí
+                                p.card-text.text-muted Giao hàng miễn phí toàn quốc cho đơn hàng trên 500.000₫
+                                
+                    .col-md-4
+                        .feature-card.card.border-0.shadow-sm.h-100.text-center.transition-card
+                            .card-body.py-5
+                                .feature-icon.mb-4
+                                    .icon-circle.icon-circle--warranty.mx-auto.d-flex.align-items-center.justify-content-center
+                                        i.fas.fa-shield-alt.fa-2x.text-white
+                                h5.card-title.font-weight-bold.mb-3 Bảo hành chính hãng
+                                p.card-text.text-muted Bảo hành chính hãng từ 12-24 tháng
+                                
+                    .col-md-4
+                        .feature-card.card.border-0.shadow-sm.h-100.text-center.transition-card
+                            .card-body.py-5
+                                .feature-icon.mb-4
+                                    .icon-circle.icon-circle--payment.mx-auto.d-flex.align-items-center.justify-content-center
+                                        i.fas.fa-credit-card.fa-2x.text-white
+                                h5.card-title.font-weight-bold.mb-3 Trả góp 0% lãi suất
+                                p.card-text.text-muted Hỗ trợ trả góp 0% lãi suất qua thẻ tín dụng
