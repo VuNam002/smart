@@ -2,12 +2,19 @@
 extends ../../layouts/default.pug 
 include ../../mixins/box-head.pug
 include ../../mixins/product-card.pug
+include ../../mixins/pagination.pug
+
 block main
   .container.my-4
     .row
       .col-12.mb-4
         +box-head(pageTitle)
+
     .row.g-3
       each item in products
         .col-xl-3.col-lg-4.col-md-6.col-sm-6.col-12
           +product-card(item)
+
+    //- Phân trang
+    if pagination.totalPage > 1
+      +pagination(pagination)

@@ -3,18 +3,33 @@ const Comment = require("../../models/comment.model");
 const ArticleCategory = require("../../models/article-category.model");
 const articleHelper = require("../../helpers/article.helper");
 const articleCategoryHelper = require("../../helpers/article-category.helper");
+const paginationHelper = require("../../helpers/pagination");
 
 // [GET] /articles/
 const index = async (req, res) => {
   try {
+    const find = {
+      status: "active",
+      deleted: false,
+    };
+
+    // Pagination
+    const countArticles = await Article.countDocuments(find);
+    let objectPagination = {
+      currentPage: 1,
+      limitItems: 10,
+    };
+    paginationHelper(objectPagination, req.query, countArticles);
+    // End Pagination
+
     // Thực hiện các truy vấn song song để tăng hiệu suất
     const [articlesFeatured, articlesNew, articles] = await Promise.all([
       articleHelper.getFeaturedArticles(3),
       articleHelper.getNewArticles(3),
-      Article.find({
-        status: "active",
-        deleted: false,
-      }).sort({ position: "desc" })
+      Article.find(find)
+        .sort({ position: "desc" })
+        .limit(objectPagination.limitItems)
+        .skip(objectPagination.skip),
     ]);
 
     res.render("client/pages/articles/index", {
@@ -22,6 +37,7 @@ const index = async (req, res) => {
       articlesFeatured: articlesFeatured,
       articlesNew: articlesNew,
       articles: articles,
+      pagination: objectPagination,
     });
   } catch (error) {
     console.log(error);
@@ -124,16 +140,31 @@ const category = async (req, res) => {
       const listSubCategoryId = listSubCategory.map(item => item.id);
       const allCategoryIds = [category.id, ...listSubCategoryId];
 
-      // Chỉ lấy các bài viết thuộc danh mục
-      const articles = await Article.find({
+      const find = {
         article_category_id: { $in: allCategoryIds },
         deleted: false,
         status: "active",
-      }).sort({ position: "desc" });
+      };
+
+      // Pagination
+      const countArticles = await Article.countDocuments(find);
+      let objectPagination = {
+        currentPage: 1,
+        limitItems: 10,
+      };
+      paginationHelper(objectPagination, req.query, countArticles);
+      // End Pagination
+
+      // Chỉ lấy các bài viết thuộc danh mục
+      const articles = await Article.find(find)
+        .sort({ position: "desc" })
+        .limit(objectPagination.limitItems)
+        .skip(objectPagination.skip);
 
       res.render("client/pages/articles/index", {
         pageTitle: category.title,
         articles,
+        pagination: objectPagination,
       });
     } else {
       res.redirect("/articles");

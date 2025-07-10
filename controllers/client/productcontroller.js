@@ -3,17 +3,32 @@ const Comment = require("../../models/comment.model");
 const ProductCategory = require("../../models/product-category.model");
 const productHelper = require("../../helpers/product.helper");
 const categoryHelper = require("../../helpers/category.helper");
+const paginationHelper = require("../../helpers/pagination");
 
 const index = async (req, res) => {
-  const products = await Product.find({
+  const find = {
     status: "active",
     deleted: false,
-  }).sort({position:"desc"})
+  };
+  // Pagination
+  const countProducts = await Product.countDocuments(find);
+  let objectPagination = {
+    currentPage: 1,
+    limitItems: 16,
+  };
+  paginationHelper(objectPagination, req.query, countProducts);
+  // End Pagination
+
+  const products = await Product.find(find)
+    .sort({ position: "desc" })
+    .limit(objectPagination.limitItems)
+    .skip(objectPagination.skip);
   const newProducts = productHelper.calcNewPrice(products);
 
   res.render("client/pages/products/index", {
     pageTitle: "Danh sách sản phẩm",
     products: newProducts,
+    pagination: objectPagination,
   });
 };
 
@@ -83,15 +98,30 @@ const category = async (req, res) => {
       const listSubCategory = await categoryHelper.getSubCategory(category.id);
       const listSubCategoryId = listSubCategory.map(item => item.id);
       const allCategoryIds = [category.id, ...listSubCategoryId];
-      const products = await Product.find({
+      const find = {
         product_category_id: { $in: allCategoryIds },
         deleted: false,
         status: "active",
-      }).sort({ position: "desc" });
+      };
+
+      // Pagination
+      const countProducts = await Product.countDocuments(find);
+      let objectPagination = {
+        currentPage: 1,
+        limitItems: 16,
+      };
+      paginationHelper(objectPagination, req.query, countProducts);
+      // End Pagination
+
+      const products = await Product.find(find)
+        .sort({ position: "desc" })
+        .limit(objectPagination.limitItems)
+        .skip(objectPagination.skip);
       const newProducts = productHelper.calcNewPrice(products);
       res.render("client/pages/products/index", {
         pageTitle: category.title,
         products: newProducts,
+        pagination: objectPagination,
       });
     } else {
       res.redirect("/products");

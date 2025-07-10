@@ -1,9 +1,9 @@
 extends ../../layouts/default.pug
 include ../../mixins/article-card.pug
+include ../../mixins/pagination.pug
 
 block main
   .container.py-5
-    //- Section: Featured Articles
     //- Các mục này chỉ hiển thị ở trang /articles chính
     if articlesFeatured
       if articlesFeatured.length > 0
@@ -14,7 +14,6 @@ block main
               .col-md-6.col-lg-4
                 +article-card(item)
 
-      //- Section: Newest Articles
       if articlesNew && articlesNew.length > 0
         .section-new-articles.mb-5
           h2.mb-4.border-bottom.pb-2 Tin mới nhất
@@ -39,3 +38,7 @@ block main
               .text-muted.mb-3
                 i.fas.fa-file-alt.fa-3x
               p.text-muted.mb-0 Không tìm thấy bài viết nào.
+
+    //- Phân trang
+    if pagination.totalPage > 1
+      +pagination(pagination)
