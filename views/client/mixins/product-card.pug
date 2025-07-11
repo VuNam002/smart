@@ -36,6 +36,15 @@ mixin product-card(item)
       
       // Action Button
       .mt-auto
-        a.btn.btn-danger.w-100.fw-semibold.py-2(href=`/products/${item.slug}`)
-          i.fas.fa-shopping-cart.me-1
-          | Mua ngay
+        form(
+          method="POST"
+          action=`/cart/add/${item._id}`
+        )
+          input(
+            type="hidden"
+            name="quantity"
+            value="1"
+          )
+          button.btn.btn-danger.w-100.fw-semibold.py-2(type="submit")
+            i.fas.fa-cart-plus.me-1
+            | Thêm vào giỏ

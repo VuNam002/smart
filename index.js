@@ -39,11 +39,6 @@ app.use(
   express.static(path.join(__dirname, "node_modules", "tinymce")),
 );
 
-app.use((req, res, next) => {
-  res.locals.messages = req.flash();
-  next();
-});
-
 app.set("views", `${__dirname}/views`);
 app.set("view engine", "pug");
 
@@ -54,23 +49,9 @@ app.locals.moment = moment;
 app.use(express.static(`${__dirname}/public`));
 app.use("/admin", express.static(__dirname + "/public/admin"));
 
-// Routes PHẢI đặt TRƯỚC 404 handler
 route(app);
 routeadmin(app);
 
-// 404 handler - phải đặt SAU routes
-app.use((req, res) => {
-  res.status(404).json({ error: "Route not found" });
-});
-
-// Error handling middleware - phải đặt CUỐI CÙNG
-app.use((err, req, res, next) => {
-  console.error("Error details:", err);
-  res.status(500).json({
-    error: "Internal Server Error",
-    message: err.message,
-  });
-});
 
 module.exports = app;
 
@@ -79,8 +60,3 @@ if (process.env.NODE_ENV !== "production") {
     console.log(`Example app listening on port ${port}`);
   });
 }
-
-
-
-
-

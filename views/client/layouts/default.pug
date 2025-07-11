@@ -1,3 +1,4 @@
+include ../mixins/alert.pug
 doctype html 
 html(lang="vi")
   head 
@@ -15,6 +16,10 @@ html(lang="vi")
     block styles
 
   body 
+    .container.mt-3
+      +alert-success(3000)
+      +alert-error(3000)
+
     include ../partials/header.pug
     block main
     include ../partials/footer.pug

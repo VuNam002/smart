@@ -10,3 +10,16 @@ if (buttonPagination.length > 0) {
     });
   });
 }
+
+  document.querySelectorAll('[show-alert]').forEach(alert => {
+    const time = parseInt(alert.dataset.time) || 3000;
+    setTimeout(() => {
+      alert.style.opacity = '0';
+      setTimeout(() => alert.remove(), 500);
+    }, time);
+
+    const closeBtn = alert.querySelector('[close-alert]');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => alert.remove());
+    }
+  });
