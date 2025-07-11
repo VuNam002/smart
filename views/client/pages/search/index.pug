@@ -1,0 +1,41 @@
+extends ../../layouts/default.pug
+include ../../mixins/box-head.pug
+include ../../mixins/product-card.pug
+
+block main
+  .container.my-4
+    .row
+      .col-12.mb-4
+        +box-head("Kết quả tìm kiếm")
+        
+    if products.length > 0
+      .row.g-3
+        each item in products
+          .col-xl-3.col-lg-4.col-md-6.col-sm-6.col-12
+            +product-card(item)
+    else
+      .col-12
+        .text-center.py-5
+          .mb-3
+            i.fas.fa-search.fa-3x.text-muted
+          h4.text-muted Không tìm thấy sản phẩm nào phù hợp.
+          p.text-muted Hãy thử tìm kiếm với từ khóa khác hoặc 
+            a(href="/products") xem tất cả sản phẩm
+          
+          // Gợi ý sản phẩm
+          if suggestedProducts && suggestedProducts.length > 0
+            .section-products-suggestion.py-5
+              .container
+                .row.mb-4
+                  .col-12.text-center
+                    .section-header.position-relative.mb-4
+                      h2.section-title.font-weight-bold.text-dark.mb-2 Có thể bạn quan tâm
+                      .title-underline.mx-auto.mb-3
+                      p.text-muted.mb-0 Những sản phẩm phù hợp dành cho bạn
+                      
+                .product-grid.position-relative
+                  .row
+                    each item in suggestedProducts
+                      .col-xl-3.col-lg-4.col-md-6.col-sm-6.col-12
+                        .product-item.h-100
+                          +product-card(item)

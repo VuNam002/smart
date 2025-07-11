@@ -6,7 +6,7 @@ header.header
         .inner-logo
           a(href="/")
             img(src="/image/logo-tokyolife.svg", alt="Logo")
-      .col-6.col-md-9
+      .col-6.col-md-6
         .inner-menu
           ul
             li
@@ -23,3 +23,17 @@ header.header
               +sub-menu(layoutBlogCategories, pathArticleCategory)
             li
               a(href="/contact") Liên hệ
+      .col-12.col-md-3
+        form(action="/search", method="GET")
+          .input-group
+            input.form-control(
+              type="text",
+              name="keyword",
+              value = keyword
+              placeholder="Tìm kiếm...",
+              style="border-radius: 25px 0 0 25px; height: 40px; border: 1px solid #ddd; background-color: #f8f9fa; box-shadow: none;"
+            )
+            button.btn(
+              type="submit",
+              style="border-radius: 0 25px 25px 0; height: 40px; background-color: #dc3545; border: 1px solid #dc3545; color: white; box-shadow: none;"
+            ) Tìm kiếm
