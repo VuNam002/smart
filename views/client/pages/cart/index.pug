@@ -1,0 +1,89 @@
+extends ../../layouts/default.pug
+include ../../mixins/box-head.pug
+include ../../mixins/alert.pug
+
+block main
+    +alert-error(5000)
+    .container.my-5
+        .row
+            .col-12
+                +box-head("Giỏ hàng")
+                
+        .row
+            .col-12
+                .card.shadow-sm
+                    .card-body
+                        if cartDetail.products.length > 0
+                            .table-responsive
+                                table.table.table-striped
+                                    thead.table-dark
+                                        tr
+                                            th.text-center(scope="col") STT
+                                            th.text-center(scope="col") Ảnh
+                                            th(scope="col") Tên sản phẩm
+                                            th.text-center(scope="col") Giá
+                                            th.text-center(scope="col") Số lượng
+                                            th.text-center(scope="col") Tổng tiền
+                                            th.text-center(scope="col") Hành động
+                                    tbody
+                                        each item, index in cartDetail.products
+                                            tr
+                                                td.text-center.align-middle
+                                                    span.badge.badge-secondary= index + 1
+                                                td.text-center.align-middle
+                                                    img.img-thumbnail(
+                                                        src=item.productInfo.thumbnail
+                                                        alt=item.productInfo.title
+                                                        style="width:60px;height:60px;object-fit:cover"
+                                                    )
+                                                td.align-middle
+                                                    a.text-decoration-none.font-weight-bold.text-primary(
+                                                        href=`/products/${item.productInfo.slug}`
+                                                    )= item.productInfo.title
+                                                td.text-center.align-middle.text-success.font-weight-bold
+                                                    = Number(item.productInfo.priceNew).toLocaleString('vi-VN') + ' VND'
+                                                td.text-center.align-middle
+                                                    .input-group.input-group-sm(style="width:100px;margin:0 auto")
+                                                        input.form-control.text-center(
+                                                            type="number"
+                                                            name="quantity"
+                                                            value=item.quantity
+                                                            min="1"
+                                                            data-item-id=item.productInfo._id
+                                                        )
+                                                td.text-center.align-middle.text-success.font-weight-bold
+                                                    = Number(item.totalPrice).toLocaleString('vi-VN') + ' VND'
+                                                td.text-center.align-middle
+                                                    a.btn.btn-outline-danger.btn-sm(
+                                                        href=`/cart/delete/${item.productInfo._id}`
+                                                        onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')"
+                                                    )
+                                                        i.fas.fa-trash-alt
+                                                        |  Xóa
+                            
+                            .row.mt-4
+                                .col-md-6
+                                    a.btn.btn-outline-primary(href="/products")
+                                        i.fas.fa-arrow-left
+                                        |  Tiếp tục mua sắm
+                                .col-md-6
+                                    .card.bg-light
+                                        .card-body
+                                            .d-flex.justify-content-between.align-items-center.mb-3
+                                                h4.mb-0.text-dark Tổng đơn hàng:
+                                                h4.mb-0.text-success.font-weight-bold= Number(cartDetail.totalPrice).toLocaleString('vi-VN') + ' VND'
+                                            .text-right
+                                                a.btn.btn-success.btn-lg(href="/checkout")
+                                                    i.fas.fa-credit-card
+                                                    |  Thanh toán
+                        else
+                            .text-center.py-5
+                                .mb-4
+                                    i.fas.fa-shopping-cart.fa-5x.text-muted
+                                h3.text-muted.mb-3 Giỏ hàng trống
+                                p.text-muted.mb-4 Bạn chưa có sản phẩm nào trong giỏ hàng
+                                a.btn.btn-primary.btn-lg(href="/products")
+                                    i.fas.fa-shopping-bag
+                                    |  Bắt đầu mua sắm
+
+    script(src="/js/cart.js")

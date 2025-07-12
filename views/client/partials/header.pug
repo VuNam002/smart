@@ -23,6 +23,8 @@ header.header
               +sub-menu(layoutBlogCategories, pathArticleCategory)
             li
               a(href="/contact") Liên hệ
+            li 
+              a(href="/cart")#mini-cart Giỏ hàng (#{miniCart && miniCart.totalQuantity ? miniCart.totalQuantity : 0})
       .col-12.col-md-3
         form(action="/search", method="GET")
           .input-group
@@ -37,3 +39,4 @@ header.header
               type="submit",
               style="border-radius: 0 25px 25px 0; height: 40px; background-color: #dc3545; border: 1px solid #dc3545; color: white; box-shadow: none;"
             ) Tìm kiếm
+      
