@@ -12,9 +12,6 @@ const articleRoutes = require("./articleRoute");
 const myAccountRoutes = require("./my-account");
 
 
-
-
-
 module.exports = (app) => {
   const PATH_ADMIN = sytemConfig.prefixAdmin;
   app.use(
