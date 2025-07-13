@@ -7,6 +7,8 @@ const productRouter = require("./productroute");
 const articleRouter = require("./articleroute");
 const searchRouter = require("./searchroute");
 const cartRouter = require("./cartroute");
+const checkoutRouter = require("./checkoutroute");
+
 
 
 module.exports = (app) => {
@@ -18,6 +20,7 @@ module.exports = (app) => {
     app.use("/",homeRoutes);
     app.use("/products",productRouter);
     app.use("/cart",cartRouter);
+    app.use("/checkout",checkoutRouter);
 
     app.use("/articles", articleRouter);
     app.use("/search",searchRouter);

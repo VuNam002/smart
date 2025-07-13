@@ -1,0 +1,103 @@
+extends ../../layouts/default.pug
+include ../../mixins/box-head.pug
+
+block main
+    .container.my-3
+        .row
+            .col-12
+                // Success message section
+                .alert.alert-success.border-0.p-4.mb-4
+                    .d-flex.align-items-center
+                        .me-3
+                            i.fas.fa-check-circle.text-success(style="font-size: 2.5rem;")
+                        .flex-grow-1
+                            h2.alert-heading.mb-2.text-success Đặt hàng thành công!
+                            p.mb-0.lead Cảm ơn bạn đã mua hàng. Chúng tôi đã nhận được đơn hàng của bạn.
+                
+                if order
+                    .row
+                        .col-lg-8
+                            // Order details
+                            .card.mb-4
+                                .card-header.bg-white.border-bottom
+                                    h5.mb-0 Chi tiết đơn hàng
+                                .card-body
+                                    .row.mb-3
+                                        .col-sm-3
+                                            strong Mã đơn hàng:
+                                        .col-sm-9
+                                            span.text-muted #{order.id || order._id}
+                                    .row.mb-3
+                                        .col-sm-3
+                                            strong Khách hàng:
+                                        .col-sm-9
+                                            span.text-muted #{order.userInfo.fullName}
+                                    .row.mb-0
+                                        .col-sm-3
+                                            strong Số điện thoại:
+                                        .col-sm-9
+                                            span.text-muted #{order.userInfo.phone}
+                            
+                            // Products table
+                            .card.mb-4
+                                .card-header.bg-white.border-bottom
+                                    h5.mb-0 Sản phẩm đã đặt
+                                .card-body.p-0
+                                    .table-responsive
+                                        table.table.table-borderless.mb-0
+                                            tbody
+                                                if order.products && order.products.length > 0
+                                                    each item, index in order.products
+                                                        tr.border-bottom
+                                                            td.py-3(style="width: 80px;")
+                                                                img.rounded(src=item.productInfo.thumbnail, alt=item.productInfo.title, width="60px", height="60px", style="object-fit: cover;")
+                                                            td.py-3
+                                                                .fw-bold #{item.productInfo.title}
+                                                                .text-muted.small Đơn giá: !{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.priceNew)}
+                                                            td.py-3.text-center
+                                                                span.text-muted Số lượng: #{item.quantity}
+                                                            td.py-3.text-end
+                                                                .fw-bold !{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalPrice)}
+                                                else
+                                                    tr
+                                                        td.py-4.text-center(colspan="4")
+                                                            .text-muted Không có thông tin sản phẩm.
+                        
+                        .col-lg-4
+                            // Order summary
+                            .card.mb-4
+                                .card-header.bg-white.border-bottom
+                                    h5.mb-0 Tóm tắt đơn hàng
+                                .card-body
+                                    .d-flex.justify-content-between.align-items-center.py-2.border-bottom
+                                        span Tổng tiền hàng:
+                                        span.fw-bold !{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalPrice)}
+                                    .d-flex.justify-content-between.align-items-center.py-2.border-bottom
+                                        span Phí vận chuyển:
+                                        span.text-success Miễn phí
+                                    .d-flex.justify-content-between.align-items-center.py-3
+                                        strong.text-dark Tổng thanh toán:
+                                        strong.text-danger.fs-5 !{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalPrice)}
+                            
+                            // Additional info
+                            .card.mb-4
+                                .card-body.text-center
+                                    .mb-3
+                                        i.fas.fa-truck.text-primary.mb-2(style="font-size: 2rem;")
+                                        h6 Thời gian giao hàng dự kiến
+                                        p.text-muted.small 2-3 ngày làm việc
+                                    .mb-3
+                                        i.fas.fa-phone.text-success.mb-2(style="font-size: 2rem;")
+                                        h6 Chúng tôi sẽ liên hệ
+                                        p.text-muted.small Qua số điện thoại #{order.userInfo.phone} để xác nhận đơn hàng
+                    
+                    // Action buttons
+                    .row.mt-4
+                        .col-md-6.mb-6
+                            a.btn.btn-outline-primary.btn-lg.w-100(href="/")
+                                i.fas.fa-arrow-left.me-2
+                                | Tiếp tục mua sắm
+                else
+                    .alert.alert-danger.text-center
+                        i.fas.fa-exclamation-triangle.me-2
+                        | Không tìm thấy thông tin đơn hàng. Vui lòng thử lại sau.

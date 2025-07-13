@@ -41,21 +41,33 @@ const detail = async (req, res) => {
     const product = await Product.findOne(find).populate("product_category_id");
 
     if (product) {
-      const comments = await Comment.find({
-        product_id: product.id,
-        deleted: false,
-      }).sort({ createdAt: "desc" });
+      const [comments, relatedProducts] = await Promise.all([
+        Comment.find({
+          product_id: product.id,
+          deleted: false,
+        }).sort({ createdAt: "desc" }),
+        Product.find({
+          _id: { $ne: product.id },
+          product_category_id: product.product_category_id,
+          status: "active",
+          deleted: false,
+        }).limit(4)
+      ]);
 
       const newProduct = productHelper.calcNewPrice([product])[0];
+      const newRelatedProducts = productHelper.calcNewPrice(relatedProducts);
+
       res.render("client/pages/products/detail", {
         pageTitle: newProduct.title,
         product: newProduct,
         comments: comments,
+        relatedProducts: newRelatedProducts
       });
     } else {
       res.redirect("/products");
     }
   } catch (error) {
+    console.log(error);
     res.redirect("/products");
   }
 };
