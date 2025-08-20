@@ -7,6 +7,11 @@ const orderSchema = new mongoose.Schema({
             phone: String,
             address: String,
         },
+    status:{
+            type: String,
+            enum: ["processing", "delivering", "completed"],
+            default: "processing"
+        },
         products: [
             {
                 product_id: String,
