@@ -11,9 +11,6 @@
             if(user.role.permissions.includes("product_view"))
                 li
                     a(href=`${prefixAdmin}/products`) Danh sách sản phẩm
-            if(user.role.permissions.includes("accounts_view"))
-                li
-                    a(href=`${prefixAdmin}/accounts`) Tài khoản
             if(user.role.permissions.includes("roles_view"))
                 li
                     a(href=`${prefixAdmin}/roles`) Nhóm quyền
@@ -30,4 +27,6 @@
             if(user.role.permissions.includes("articles_view"))
                 li 
                     a(href=`${prefixAdmin}/articles`) Danh sách bài viết
-    
+            if(user.role.permissions.includes("orders_view"))
+                li
+                    a(href=`${prefixAdmin}/orders`) Danh sách đơn hàng

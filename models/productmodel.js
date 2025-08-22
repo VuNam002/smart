@@ -19,7 +19,7 @@ const productSchema = new mongoose.Schema(
     },
     brand: {
       type: String,
-      required: true,
+      required: false,
     },
     ratings: [
       { star: Number },
@@ -31,7 +31,7 @@ const productSchema = new mongoose.Schema(
       default: "active",
     },
     featured: {
-      type: String, // Có thể dùng enum: ["0", "1"]
+      type: String, 
       enum: ["0", "1"],
       default: "0",
     },
@@ -42,7 +42,10 @@ const productSchema = new mongoose.Schema(
       unique: true,
     },
     createdBy: {
-      account_id: String,
+      account_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Account",
+      },
       createdAt: {
         type: Date,
         default: Date.now,

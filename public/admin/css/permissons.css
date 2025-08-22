@@ -1,0 +1,80 @@
+/* CSS hiệu ứng cuộn cho Bootstrap - Thêm vào file CSS hiện tại */
+
+/* Cuộn mượt mà */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Keyframes cho hiệu ứng */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Áp dụng hiệu ứng cho các phần tử */
+.mb-4 {
+    animation: fadeInUp 0.8s ease;
+}
+
+.btn {
+    animation: fadeIn 1s ease;
+    animation-delay: 0.3s;
+    animation-fill-mode: both;
+}
+
+.mt-4 {
+    animation: fadeInUp 0.6s ease;
+    animation-fill-mode: both;
+}
+
+.table {
+    animation: fadeInUp 0.8s ease;
+    animation-fill-mode: both;
+}
+
+/* Delay cho từng bảng */
+.table:nth-of-type(1) { animation-delay: 0.2s; }
+.table:nth-of-type(2) { animation-delay: 0.4s; }
+.table:nth-of-type(3) { animation-delay: 0.6s; }
+.table:nth-of-type(4) { animation-delay: 0.8s; }
+.table:nth-of-type(5) { animation-delay: 1.0s; }
+.table:nth-of-type(6) { animation-delay: 1.2s; }
+.table:nth-of-type(7) { animation-delay: 1.4s; }
+.table:nth-of-type(8) { animation-delay: 1.6s; }
+
+/* Hiệu ứng hover cho bảng */
+.table:hover {
+    transform: translateY(-2px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Hiệu ứng cho checkbox */
+input[type="checkbox"] {
+    transition: all 0.3s ease;
+}
+
+input[type="checkbox"]:hover {
+    transform: scale(1.1);
+}
+
+/* Hiệu ứng cho button */
+.btn-primary {
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+}

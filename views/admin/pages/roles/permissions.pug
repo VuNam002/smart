@@ -403,7 +403,66 @@ block main
                                 data-role-id=item._id
                                 checked=isChecked
                             )
-
+        //Bảng 8: Danh sách đơn hàng
+        h4(class="mt-4 mb-3") Danh sách đơn hàng
+        table(
+            class="table table-hover table-sm"
+            table-permissions
+        )
+            thead
+                tr
+                    th Tính năng
+                    each item in records
+                        th(class="text-center" data-id=item._id) #{item.title}
+            tbody
+                tr(data-name="orders_view")
+                    td Xem
+                    each item in records
+                        td(class="text-center")
+                            - const isChecked = item.permissions && item.permissions.includes("orders_view")
+                            input(
+                                type="checkbox" 
+                                name="permissions"
+                                value="orders_view"
+                                data-role-id=item._id
+                                checked=isChecked
+                            )
+                tr(data-name="orders_create")
+                    td Thêm mới
+                    each item in records
+                        td(class="text-center")
+                            - const isChecked = item.permissions && item.permissions.includes("orders_create")
+                            input(
+                                type="checkbox" 
+                                name="permissions"
+                                value="orders_create"
+                                data-role-id=item._id
+                                checked=isChecked
+                            )
+                tr(data-name="orders_edit")
+                    td Chỉnh sửa
+                    each item in records
+                        td(class="text-center")
+                            - const isChecked = item.permissions && item.permissions.includes("orders_edit")
+                            input(
+                                type="checkbox" 
+                                name="permissions"
+                                value="orders_edit"
+                                data-role-id=item._id
+                                checked=isChecked
+                            )
+                tr(data-name="orders_delete")
+                    td Xóa
+                    each item in records
+                        td(class="text-center")
+                            - const isChecked = item.permissions && item.permissions.includes("orders_delete")
+                            input(
+                                type="checkbox" 
+                                name="permissions"
+                                value="orders_delete"
+                                data-role-id=item._id
+                                checked=isChecked
+                            )
     form(
         id="form-change-permissions"
         method="POST"
@@ -425,3 +484,4 @@ block main
             )
     
     script(src="/admin/js/role.js")
+    link(rel="stylesheet", href="/admin/css/permissons.css")
