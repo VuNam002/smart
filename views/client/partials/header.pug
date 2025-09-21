@@ -1,4 +1,5 @@
 include ../mixins/sub-menu.pug
+
 header.header
   .container
     .row.align-items-center
@@ -23,20 +24,31 @@ header.header
               +sub-menu(layoutBlogCategories, pathArticleCategory)
             li
               a(href="/contact") Liên hệ
-            li 
+            li
               a(href="/cart")#mini-cart Giỏ hàng (#{miniCart && miniCart.totalQuantity ? miniCart.totalQuantity : 0})
       .col-12.col-md-3
-        form(action="/search", method="GET")
-          .input-group
-            input.form-control(
-              type="text",
-              name="keyword",
-              value = keyword
-              placeholder="Tìm kiếm...",
-              style="border-radius: 25px 0 0 25px; height: 40px; border: 1px solid #ddd; background-color: #f8f9fa; box-shadow: none;"
-            )
-            button.btn(
-              type="submit",
-              style="border-radius: 0 25px 25px 0; height: 40px; background-color: #dc3545; border: 1px solid #dc3545; color: white; box-shadow: none;"
-            ) Tìm kiếm
-      
+        .d-flex.flex-column.flex-md-row.align-items-center.gap-2
+          form(action="/search", method="GET").flex-grow-1
+            .input-group
+              input.form-control(
+                type="text",
+                name="keyword",
+                value = keyword
+                placeholder="Tìm kiếm...",
+                style="border-radius: 25px 0 0 25px; height: 40px; border: 1px solid #ddd; background-color: #f8f9fa; box-shadow: none;"
+              )
+              button.btn(
+                type="submit",
+                style="border-radius: 0 25px 25px 0; height: 40px; background-color: #dc3545; border: 1px solid #dc3545; color: white; box-shadow: none;"
+              ) Tìm kiếm
+          .user-actions
+            ul.nav.d-flex
+            if(user)
+              li 
+                a(href = '/user/logout') Đăng xuất
+            else
+              li.nav-item
+                a.nav-link(href="/user/register") Đăng ký
+              li.nav-item
+                a.nav-link(href="/user/login") Đăng nhập
+              
